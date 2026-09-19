@@ -54,6 +54,8 @@ agent or a developer script can run the whole flow without touching a UI.
 | 🔧 Initialize tx | [`9f80c750…`](https://stellar.expert/explorer/testnet/tx/9f80c7505dbf9c579c63dc74d61f85d3f14923ffff13d6fa09819fc813865137) |
 | 💸 Live fee collection #1 | [`ffedc71a…`](https://stellar.expert/explorer/testnet/tx/ffedc71a2219c3f79b576fea831982fb7a0feab4dffdcad0fd544c1764bd4a23) |
 | 💸 Live fee collection #2 | [`8f841537…`](https://stellar.expert/explorer/testnet/tx/8f841537d4215ccb084b8f49a32df31d33e9f55dd34c9df14ae82a5f85bda66c) |
+| 🌐 Live web demo | [`card.batuhan4.com`](https://card.batuhan4.com) (fallback [`stellar-card-54s.pages.dev`](https://stellar-card-54s.pages.dev)) |
+| 🪪 Edge-issued test card | `ic_1UHdbSEAzMrENaFXBEQU1yq4` (last4 `0203`) via on-chain fee [`8b822a21…`](https://stellar.expert/explorer/testnet/tx/8b822a2172a2b6004cd64274a0e8bb7d81f89b0ea4ffc429367395d507190238) |
 
 The second live run issued a Visa card (`last4 0161`), revealed its test-mode
 PAN/CVC, then froze it — all through the CLI. Full evidence, hashes, and the
@@ -80,6 +82,9 @@ card buy ──► Soroban fee vault `collect_fee` (fee in XLM, payer = tx sourc
 - **Cards** — Stripe Issuing test mode (cardholder + virtual card). Stripe test
   mode does expose PAN/CVC for virtual cards through the reveal API; the CLI
   returns them once and stores nothing beyond the summary.
+- **Web demo** — the same flow from the browser: Freighter pays the fee, then a
+  Cloudflare Pages Function verifies it on Horizon and issues the Stripe
+  test-mode card; see [Web demo](#️-web-demo).
 - **State** — local JSON/TOML under `~/.config/stellar-card`, `0600` permissions,
   no database, no server.
 
@@ -214,17 +219,41 @@ is deliberate: StellarCard never pretends to be an anchor or custodian.
 
 ## 🖥️ Web demo
 
-A Next.js dashboard with Freighter wallet connection lives in [`web/`](web/).
-It connects to Stellar testnet, shows the connected account balance, offers a
-Friendbot link for unfunded accounts, and invokes `collect_fee` through the
-Soroban contract client.
+Live at [`card.batuhan4.com`](https://card.batuhan4.com) (fallback:
+[`stellar-card-54s.pages.dev`](https://stellar-card-54s.pages.dev)) — a Next.js
+static export on Cloudflare Pages with edge functions.
+
+**The web demo is not a mock.** Every step touches real infrastructure:
+
+1. Freighter signs a real Soroban `collect_fee` transaction on Stellar testnet.
+2. A Cloudflare Pages Function ([`web/functions/`](web/functions/)) verifies
+   that transaction on Horizon: it succeeded, it is fresh (< 20 minutes), it
+   contains a native transfer **to the fee vault** **from the payer**, and the
+   amount covers the quoted $0.10 + 0.20% fee.
+3. The same function issues a real Stripe **test-mode** virtual card and stores
+   a card↔cardholder mapping in Cloudflare KV. A fee transaction can be used
+   once — replays return `409`. PAN/CVC are returned only for the cardholder's
+   email; other reads return `403`. `livemode: false` is exposed in every
+   response.
+4. Freeze calls Stripe directly from the edge function.
+
+Stripe secrets never reach the browser: `STRIPE_TEST_KEY` is a Pages secret, and
+the only public configuration is `NEXT_PUBLIC_FEE_VAULT_CONTRACT_ID`.
 
 ```bash
 cd web
 npm install
 echo "NEXT_PUBLIC_FEE_VAULT_CONTRACT_ID=CACWNJ65VRCHKMGZSIGRH775ZU6S3C7MGAFVIKPBMVIJ62NIXVEXGVQQ" > .env.local
-npm run dev
+
+# local dev: static export + Pages Functions + local KV
+npm run build && npx wrangler pages dev out
+
+# deploy (Cloudflare account + `wrangler login`)
+npx wrangler pages deploy --project-name stellar-card --branch main
 ```
+
+Edge API surface: `POST /api/card` (issue), `GET /api/card/:id`,
+`POST /api/card/:id/freeze`, `GET /api/cards?email=`.
 
 ## 🧪 Testing
 
@@ -257,9 +286,10 @@ Built for the Stellar Pro Hackathon 2026, Genesis Track.
 
 - The Stellar integration is real and live on testnet: Horizon for deposits and
   balances, Friendbot for funding, classic transactions for trustlines, a
-  deployed Soroban contract for fee collection, and a SEP-10/SEP-24 on-ramp
-  verified against SDF's reference anchor (links above). Nothing in the testnet
-  flows is simulated.
+  deployed Soroban contract for fee collection, a SEP-10/SEP-24 on-ramp verified
+  against SDF's reference anchor, and a hosted web demo whose edge function
+  issues real Stripe test-mode cards after verifying the on-chain fee (links
+  above). Nothing in the testnet flows is simulated.
 - AI skills used during development, disclosed per event expectations:
   - [`stellar/stellar-dev-skill`](https://github.com/stellar/stellar-dev-skill)
     — dapp module (Apache-2.0), reference for wallet connection,
@@ -290,6 +320,8 @@ stellar-card/
 ├── tests/                  # offline CLI integration tests
 ├── scripts/                # deploy and demo scripts
 ├── web/                    # Next.js + Freighter dashboard
+│   ├── functions/          # Cloudflare Pages Functions (edge card issuance API)
+│   └── wrangler.toml       # Pages project, KV binding, edge vars
 ├── docs/                   # UAT evidence, PRD
 └── PRD.md                  # product requirements
 ```

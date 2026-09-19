@@ -127,6 +127,30 @@ Notes:
   `anchor_sep24_url`, and `anchor_web_auth_endpoint` can point at any SEP-24
   anchor without code changes.
 
+## Web demo edge issuance (Cloudflare Pages, live)
+
+The hosted web demo runs the same real flow from the browser: Freighter signs a
+real `collect_fee` transaction, and a Cloudflare Pages Function verifies it on
+Horizon before issuing a real Stripe test-mode card. Verified live on 2026-09-20:
+
+| Item | Value |
+|---|---|
+| Production URL | `https://stellar-card-54s.pages.dev` (custom domain `card.batuhan4.com` attaching) |
+| Deployments | `f530b807` (first), `8616a559` (after `STRIPE_TEST_KEY` secret) |
+| KV namespace | `STELLAR_CARD_KV` = `55926b9b6752448ea08f05d30bf44253` |
+| Local run | fee tx `fe9a19fe51a91338425dfe97b93e1242915083eb90f665b0ca313b37a265e163` → Stripe card `ic_1UHdX0EAzMrENaFXlepCYbLj`, last4 `0187` |
+| Production run | fee tx `8b822a2172a2b6004cd64274a0e8bb7d81f89b0ea4ffc429367395d507190238` → Stripe card `ic_1UHdbSEAzMrENaFXBEQU1yq4`, last4 `0203` |
+| PAN/CVC expand | returned (`4000…` test PAN, `cvc` present, `livemode: false`) |
+| Replay guard | same fee tx again → HTTP `409` |
+| Wrong-email read | `GET /api/card/:id` with another email → HTTP `403` |
+| Freeze | `POST /api/card/:id/freeze` → `status: inactive` |
+| Fee verification | Horizon success + freshness < 20 min + native transfer to the vault from the payer + amount ≥ quoted fee (5% price-drift tolerance) |
+
+The static UI no longer fabricates card data: empty and error states are honest,
+and every card shown comes from Stripe through the edge API. `npm run build`
+(static export) and `npm run lint` pass; `STRIPE_TEST_KEY` lives only as a
+Pages secret.
+
 ## Repository test coverage (offline)
 `cargo test --workspace` runs 66 tests with no network access:
 

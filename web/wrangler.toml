@@ -1,0 +1,12 @@
+name = "stellar-card"
+compatibility_date = "2026-01-01"
+pages_build_output_dir = "out"
+
+[vars]
+FEE_VAULT_CONTRACT_ID = "CACWNJ65VRCHKMGZSIGRH775ZU6S3C7MGAFVIKPBMVIJ62NIXVEXGVQQ"
+HORIZON_URL = "https://horizon-testnet.stellar.org"
+COINBASE_URL = "https://api.coinbase.com"
+
+[[kv_namespaces]]
+binding = "STELLAR_CARD_KV"
+id = "55926b9b6752448ea08f05d30bf44253"

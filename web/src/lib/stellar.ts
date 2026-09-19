@@ -96,3 +96,97 @@ export function explorerAccountUrl(address: string): string {
 export function friendbotUrl(address: string): string {
   return `${FRIENDBOT_URL}?addr=${encodeURIComponent(address)}`;
 }
+
+export interface IssuedCard {
+  id: string;
+  last4: string;
+  exp: string;
+  status: string;
+  brand: string;
+  number: string | null;
+  cvc: string | null;
+  livemode: boolean;
+  amountUsd: number;
+  holderName: string;
+  feeTxHash: string;
+}
+
+export interface CardSummary {
+  id: string;
+  last4: string;
+  exp: string;
+  status: string;
+  brand: string;
+  created: number;
+  amountUsd: number | null;
+  feeTxHash: string | null;
+}
+
+async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(path, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(init?.headers ?? {}),
+    },
+  });
+  const body = (await response.json().catch(() => null)) as {
+    error?: string;
+  } | null;
+  if (!response.ok) {
+    throw new Error(
+      body?.error ?? `Edge API request failed (${response.status})`
+    );
+  }
+  return body as T;
+}
+
+export function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+export async function issueCardViaApi(input: {
+  payer: string;
+  txHash: string;
+  amountUsd: number;
+  name: string;
+  email: string;
+}): Promise<IssuedCard> {
+  const body = await api<{ card: IssuedCard }>("/api/card", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return body.card;
+}
+
+export async function listCards(email: string): Promise<CardSummary[]> {
+  const body = await api<{ cards: CardSummary[] }>(
+    `/api/cards?email=${encodeURIComponent(email)}`
+  );
+  return body.cards;
+}
+
+export async function getCard(id: string, email: string): Promise<IssuedCard> {
+  const body = await api<{ card: IssuedCard }>(
+    `/api/card/${encodeURIComponent(id)}?email=${encodeURIComponent(email)}`
+  );
+  return body.card;
+}
+
+export async function freezeCardViaApi(
+  id: string,
+  email: string
+): Promise<IssuedCard> {
+  const body = await api<{ card: IssuedCard }>(
+    `/api/card/${encodeURIComponent(id)}/freeze`,
+    { method: "POST", body: JSON.stringify({ email }) }
+  );
+  return body.card;
+}
+
+export function groupCardNumber(number: string): string {
+  return number
+    .replace(/\s+/g, "")
+    .replace(/(.{4})/g, "$1 ")
+    .trim();
+}

@@ -6,7 +6,7 @@ import { contract } from "@stellar/stellar-sdk";
 import { Icon } from "@/components/Icon";
 import { CrabMascot } from "@/components/CrabMascot";
 import { useWallet } from "@/contexts/WalletContext";
-import { useLocalStorage, type CardRecord } from "@/hooks/useStellar";
+import { useLocalStorage } from "@/hooks/useStellar";
 import {
   DEFAULT_FIXED_FEE_CENTS,
   FEE_VAULT_CONTRACT_ID,
@@ -17,10 +17,18 @@ import {
   cardFeeCents,
   explorerContractUrl,
   explorerTxUrl,
+  freezeCardViaApi,
   generateFeeReference,
+  getCard,
+  groupCardNumber,
   isFeeVaultConfigured,
+  isValidEmail,
+  issueCardViaApi,
+  listCards,
   usdCentsToStroops,
+  type CardSummary,
   type FeeVaultContract,
+  type IssuedCard,
 } from "@/lib/stellar";
 
 const XLM_PRICE_URL = "https://api.coinbase.com/v2/prices/XLM-USD/spot";
@@ -29,7 +37,18 @@ export default function CardRevealPage() {
   const { address, connected, connecting, connect, signTransaction } = useWallet();
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
-  const [cards, setCards] = useLocalStorage<CardRecord[]>("***REMOVED***-cards", []);
+  const [cardholderName, setCardholderName] = useLocalStorage(
+    "stellar-card-holder-name",
+    "StellarCard Demo User"
+  );
+  const [cardholderEmail, setCardholderEmail] = useLocalStorage(
+    "stellar-card-holder-email",
+    "demo@stellar-card.dev"
+  );
+  const [cards, setCards] = useState<CardSummary[]>([]);
+  const [activeCard, setActiveCard] = useState<IssuedCard | null>(null);
+  const [loadingCards, setLoadingCards] = useState(false);
+  const [freezing, setFreezing] = useState(false);
   const [amountUsd, setAmountUsd] = useState(50);
   const [xlmPrice, setXlmPrice] = useState<number | null>(null);
   const [buying, setBuying] = useState(false);
@@ -56,26 +75,59 @@ export default function CardRevealPage() {
     };
   }, [fetchPrice]);
 
-  // Use first card from storage, or demo data
-  const card = cards[0] || {
-    id: "crd_demo",
-    name: "***REMOVED*** Agent",
-    last4: "4242",
-    exp: "04/29",
-    cvc: "123",
-    balance: "$250.00",
-    status: "active",
-  };
+  const loadCards = useCallback(async (email: string) => {
+    if (!isValidEmail(email)) return;
+    setLoadingCards(true);
+    try {
+      setCards(await listCards(email));
+    } catch {
+      // An empty list is the honest state; errors surface when issuing.
+    } finally {
+      setLoadingCards(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const email = cardholderEmail.trim().toLowerCase();
+    if (!isValidEmail(email)) return;
+    let cancelled = false;
+    listCards(email)
+      .then((list) => {
+        if (!cancelled) setCards(list);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [cardholderEmail]);
+
+  const currentSummary =
+    cards.find((item) => item.id === activeCard?.id) ?? cards[0] ?? null;
+  const hasCard = activeCard !== null || currentSummary !== null;
+  const last4 = activeCard?.last4 ?? currentSummary?.last4 ?? "••••";
+  const cardStatus = activeCard?.status ?? currentSummary?.status ?? "none";
+  const cardExp = activeCard?.exp ?? currentSummary?.exp ?? "••/••";
+  const cardBalance =
+    activeCard !== null
+      ? `$${activeCard.amountUsd.toFixed(2)}`
+      : currentSummary?.amountUsd != null
+        ? `$${currentSummary.amountUsd.toFixed(2)}`
+        : "—";
+  const feeTxHash = activeCard?.feeTxHash ?? currentSummary?.feeTxHash ?? null;
+
+  const card = { last4 };
 
   const cardDetails = {
-    number: `4242 4242 4242 ${card.last4}`,
-    exp: card.exp,
-    cvc: "cvc" in card ? card.cvc : "***",
-    name: card.name,
-    brand: "Visa",
-    status: card.status,
-    balance: card.balance,
-    id: card.id,
+    number: activeCard?.number
+      ? groupCardNumber(activeCard.number)
+      : "•••• •••• •••• ••••",
+    exp: cardExp,
+    cvc: activeCard?.cvc ?? "•••",
+    name: activeCard?.holderName ?? cardholderName,
+    brand: activeCard?.brand ?? currentSummary?.brand ?? "—",
+    status: cardStatus,
+    balance: cardBalance,
+    id: activeCard?.id ?? currentSummary?.id ?? "—",
   };
 
   const amountCents = Math.round(amountUsd * 100);
@@ -94,6 +146,19 @@ export default function CardRevealPage() {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  const issueCard = async (hash: string) => {
+    const card = await issueCardViaApi({
+      payer: address ?? "",
+      txHash: hash,
+      amountUsd,
+      name: cardholderName.trim() || "StellarCard Demo User",
+      email: cardholderEmail.trim().toLowerCase(),
+    });
+    setActiveCard(card);
+    setRevealed(false);
+    await loadCards(cardholderEmail.trim().toLowerCase());
+  };
+
   const buyCard = async () => {
     if (!address) {
       setPurchaseError("Connect Freighter before paying the card fee.");
@@ -107,6 +172,10 @@ export default function CardRevealPage() {
     }
     if (!amountValid) {
       setPurchaseError("Card amount must be between $5.00 and $500.00.");
+      return;
+    }
+    if (!isValidEmail(cardholderEmail.trim())) {
+      setPurchaseError("Enter a valid cardholder email before buying a card.");
       return;
     }
 
@@ -147,24 +216,73 @@ export default function CardRevealPage() {
       }
 
       setPurchaseHash(hash);
-      const newCard: CardRecord = {
-        id: `crd_${Date.now().toString(36)}`,
-        name: "***REMOVED*** Agent",
-        last4: "4242",
-        exp: "04/29",
-        cvc: "123",
-        balance: `$${amountUsd.toFixed(2)}`,
-        status: "active",
-        feeTxHash: hash,
-        createdAt: Date.now(),
-      };
-      setCards(prev => [newCard, ...prev]);
+      await issueCard(hash);
     } catch (error) {
       setPurchaseError(
         error instanceof Error ? error.message : "Fee payment failed"
       );
     } finally {
       setBuying(false);
+    }
+  };
+
+  const retryIssuance = async () => {
+    if (!purchaseHash) return;
+    setBuying(true);
+    setPurchaseError(null);
+    try {
+      await issueCard(purchaseHash);
+    } catch (error) {
+      setPurchaseError(
+        error instanceof Error ? error.message : "Card issuance failed"
+      );
+    } finally {
+      setBuying(false);
+    }
+  };
+
+  const revealCard = async () => {
+    if (activeCard?.number) {
+      setRevealed(true);
+      return;
+    }
+    const cardId = activeCard?.id ?? currentSummary?.id;
+    if (!cardId) {
+      setPurchaseError("Buy a card first — there is no issued card to reveal.");
+      return;
+    }
+    try {
+      const detail = await getCard(cardId, cardholderEmail.trim().toLowerCase());
+      setActiveCard(detail);
+      setRevealed(true);
+    } catch (error) {
+      setPurchaseError(
+        error instanceof Error ? error.message : "Could not load card details"
+      );
+    }
+  };
+
+  const freezeActiveCard = async () => {
+    const cardId = activeCard?.id ?? currentSummary?.id;
+    if (!cardId) {
+      setPurchaseError("No card to freeze.");
+      return;
+    }
+    setFreezing(true);
+    setPurchaseError(null);
+    try {
+      const frozen = await freezeCardViaApi(
+        cardId,
+        cardholderEmail.trim().toLowerCase()
+      );
+      setActiveCard(frozen);
+      await loadCards(cardholderEmail.trim().toLowerCase());
+    } catch (error) {
+      setPurchaseError(
+        error instanceof Error ? error.message : "Could not freeze the card"
+      );
+    } finally {
+      setFreezing(false);
     }
   };
 
@@ -184,7 +302,9 @@ export default function CardRevealPage() {
                 className="relative w-full h-full preserve-3d cursor-pointer"
                 animate={{ rotateY: revealed ? 180 : 0 }}
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] as const }}
-                onClick={() => !revealed && setRevealed(true)}
+                onClick={() => {
+                  if (!revealed) void revealCard();
+                }}
               >
                 {/* Front */}
                 <div className="absolute inset-0 backface-hidden">
@@ -193,8 +313,22 @@ export default function CardRevealPage() {
                     <div className="flex justify-between items-start mb-8">
                       <span className="font-headline text-xl font-bold italic opacity-80">VISA</span>
                       <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                        <span className="text-[10px] uppercase tracking-widest opacity-70">Active</span>
+                        <span
+                          className={`w-2 h-2 rounded-full ${
+                            cardStatus === "active"
+                              ? "bg-green-400 animate-pulse"
+                              : cardStatus === "inactive"
+                                ? "bg-amber-400"
+                                : "bg-slate-400"
+                          }`}
+                        />
+                        <span className="text-[10px] uppercase tracking-widest opacity-70">
+                          {cardStatus === "active"
+                            ? "Active"
+                            : cardStatus === "inactive"
+                              ? "Frozen"
+                              : "No card"}
+                        </span>
                       </div>
                     </div>
                     <div className="w-10 h-7 rounded-md bg-amber-300/80 mb-8 flex items-center justify-center">
@@ -242,8 +376,13 @@ export default function CardRevealPage() {
             </div>
 
             {!revealed && (
-              <button onClick={() => setRevealed(true)} className="w-full max-w-md mx-auto block py-4 bg-primary text-on-primary rounded-xl font-bold text-sm shadow-lg shadow-primary-container/20 hover:shadow-primary-container/40 transition-all active:scale-[0.98]">
-                <Icon name="visibility" className="mr-2 align-middle" /> Reveal Card Details
+              <button
+                onClick={revealCard}
+                disabled={!hasCard}
+                className="w-full max-w-md mx-auto block py-4 bg-primary text-on-primary rounded-xl font-bold text-sm shadow-lg shadow-primary-container/20 hover:shadow-primary-container/40 transition-all active:scale-[0.98] disabled:opacity-60"
+              >
+                <Icon name="visibility" className="mr-2 align-middle" />
+                {hasCard ? "Reveal Card Details" : "Buy a Card to Reveal Real Details"}
               </button>
             )}
 
@@ -254,8 +393,31 @@ export default function CardRevealPage() {
                 <span className="text-[10px] font-mono text-outline uppercase tracking-widest">Stellar Testnet</span>
               </div>
               <p className="text-xs text-on-surface-variant mb-5">
-                The $0.10 + 0.20% fee is collected on-chain by the Soroban fee vault. The demo card below is stored locally; the web app does not issue the card itself.
+                The $0.10 + 0.20% fee is collected on-chain by the Soroban fee vault.
+                A Cloudflare edge function then verifies that transaction on Horizon and
+                issues a real Stripe test-mode virtual card. Stripe secrets stay in the
+                edge function; the browser only receives the card it paid for.
               </p>
+
+              <label className="block text-[10px] uppercase tracking-widest text-outline font-bold mb-2">
+                Cardholder Name
+              </label>
+              <input
+                type="text"
+                value={cardholderName}
+                onChange={(event) => setCardholderName(event.target.value)}
+                className="w-full bg-surface-container rounded-xl px-4 py-3 mb-5 text-sm outline-none"
+              />
+
+              <label className="block text-[10px] uppercase tracking-widest text-outline font-bold mb-2">
+                Cardholder Email
+              </label>
+              <input
+                type="email"
+                value={cardholderEmail}
+                onChange={(event) => setCardholderEmail(event.target.value)}
+                className="w-full bg-surface-container rounded-xl px-4 py-3 mb-5 text-sm outline-none"
+              />
 
               {!contractConfigured && (
                 <div className="mb-5 flex items-start gap-2 rounded-xl bg-error-container/40 p-4 text-xs text-error">
@@ -317,6 +479,16 @@ export default function CardRevealPage() {
                 </div>
               )}
 
+              {purchaseHash && !activeCard && (
+                <button
+                  onClick={retryIssuance}
+                  disabled={buying}
+                  className="mb-5 w-full py-3 bg-tertiary/10 text-tertiary rounded-xl font-bold text-xs disabled:opacity-60"
+                >
+                  Fee is on-chain — retry card issuance
+                </button>
+              )}
+
               {purchaseError && (
                 <div className="mb-5 flex items-start gap-2 rounded-xl bg-error-container/40 p-4 text-xs text-error">
                   <Icon name="error" className="text-sm mt-0.5" />
@@ -358,13 +530,62 @@ export default function CardRevealPage() {
                 <span className="bg-tertiary/10 text-tertiary text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider">{cardDetails.status}</span>
               </div>
               <div className="space-y-4">
-                {[{ label: "Card ID", value: cardDetails.id, mono: true }, { label: "Brand", value: cardDetails.brand }, { label: "Balance", value: cardDetails.balance, mono: true }, { label: "Network", value: "Stellar Testnet" }].map((row) => (
+                {[{ label: "Card ID", value: cardDetails.id, mono: true }, { label: "Brand", value: cardDetails.brand }, { label: "Card Amount", value: cardDetails.balance, mono: true }, { label: "Network", value: "Stellar Testnet" }].map((row) => (
                   <div key={row.label} className="flex justify-between items-center">
                     <span className="text-xs text-outline uppercase tracking-widest">{row.label}</span>
                     <span className={`text-sm font-medium ${row.mono ? "font-mono" : ""}`}>{row.value}</span>
                   </div>
                 ))}
               </div>
+              {feeTxHash && (
+                <a
+                  href={explorerTxUrl(feeTxHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 block text-[10px] font-mono text-outline hover:text-primary truncate"
+                >
+                  Fee tx: {feeTxHash}
+                </a>
+              )}
+              {loadingCards && (
+                <p className="mt-4 text-[10px] text-outline">Loading issued cards…</p>
+              )}
+              {cards.length > 0 && (
+                <div className="mt-6 border-t border-outline-variant/30 pt-4">
+                  <p className="text-[10px] uppercase tracking-widest text-outline font-bold mb-3">
+                    Cards issued to {cardholderEmail} ({cards.length})
+                  </p>
+                  <div className="space-y-2">
+                    {cards.map((item) => {
+                      const selected =
+                        activeCard?.id === item.id ||
+                        (activeCard === null && currentSummary?.id === item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            setActiveCard(null);
+                            setRevealed(false);
+                            void getCard(item.id, cardholderEmail.trim().toLowerCase())
+                              .then(setActiveCard)
+                              .catch(() => undefined);
+                          }}
+                          className={`w-full flex items-center justify-between p-3 rounded-xl text-left text-xs transition-colors ${
+                            selected
+                              ? "bg-primary/10"
+                              : "bg-surface-container hover:bg-surface-container-high"
+                          }`}
+                        >
+                          <span className="font-mono">•••• {item.last4}</span>
+                          <span className="text-outline">
+                            {item.status} · {item.exp}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <AnimatePresence>
@@ -389,12 +610,36 @@ export default function CardRevealPage() {
             <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft-diffuse shadow-soft-diffuse animate-slide-in-right delay-300">
               <h3 className="font-headline font-bold text-lg mb-4">Actions</h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center gap-3 p-3 bg-surface-container rounded-xl hover:bg-surface-container-high transition-all text-sm">
-                  <Icon name="ac_unit" className="text-primary" /><span className="font-medium">Freeze Card</span>
+                <button
+                  onClick={freezeActiveCard}
+                  disabled={freezing || !hasCard || cardStatus === "inactive"}
+                  className="w-full flex items-center gap-3 p-3 bg-surface-container rounded-xl hover:bg-surface-container-high transition-all text-sm disabled:opacity-60"
+                >
+                  <Icon name="ac_unit" className="text-primary" />
+                  <span className="font-medium">
+                    {freezing
+                      ? "Freezing..."
+                      : cardStatus === "inactive"
+                        ? "Card Frozen"
+                        : "Freeze Card"}
+                  </span>
                 </button>
-                <button className="w-full flex items-center gap-3 p-3 bg-surface-container rounded-xl hover:bg-surface-container-high transition-all text-sm">
-                  <Icon name="history" className="text-secondary" /><span className="font-medium">Transaction History</span>
-                </button>
+                {feeTxHash ? (
+                  <a
+                    href={explorerTxUrl(feeTxHash)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center gap-3 p-3 bg-surface-container rounded-xl hover:bg-surface-container-high transition-all text-sm"
+                  >
+                    <Icon name="history" className="text-secondary" />
+                    <span className="font-medium">On-chain Fee Transaction</span>
+                  </a>
+                ) : (
+                  <div className="w-full flex items-center gap-3 p-3 bg-surface-container rounded-xl text-sm opacity-60">
+                    <Icon name="history" className="text-secondary" />
+                    <span className="font-medium">No fee transaction yet</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -403,8 +648,8 @@ export default function CardRevealPage() {
                 <Icon name="terminal" className="text-sm" />
                 <span className="text-[10px] uppercase tracking-widest">CLI Equivalent</span>
               </div>
-              <p className="text-green-400">$ ***REMOVED*** card show {cardDetails.id}</p>
-              <p className="text-primary mt-1">{`{"ok":true,"data":{"number":"4242...","exp":"${cardDetails.exp}","cvc":"***"}}`}</p>
+              <p className="text-green-400">$ stellar-card card show {cardDetails.id}</p>
+              <p className="text-primary mt-1">{`{"ok":true,"data":{"last4":"${card.last4}","exp":"${cardDetails.exp}","status":"${cardDetails.status}"}}`}</p>
             </div>
           </section>
         </div>

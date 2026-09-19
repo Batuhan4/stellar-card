@@ -226,6 +226,16 @@ and the transactions below. Build links from real values only:
 | Contract | `https://stellar.expert/explorer/testnet/contract/<C...>` |
 | Account | `https://stellar.expert/explorer/testnet/account/<G...>` |
 
+## Hosted web demo (reference, not agent-run)
+
+`https://card.batuhan4.com` (fallback `https://stellar-card-54s.pages.dev`) is
+the hosted demo. It is **not** a simulation: Freighter pays the fee on Stellar
+testnet, then a Cloudflare Pages Function verifies the transaction on Horizon
+and issues a real Stripe test-mode card. Edge API: `POST /api/card`,
+`GET /api/card/:id`, `POST /api/card/:id/freeze`, `GET /api/cards?email=`.
+Never describe this demo as mocked; if a claim is not backed by a live
+transaction or Stripe object, do not make it.
+
 ## Command reference
 
 | Command | Purpose |
