@@ -1,6 +1,7 @@
+use crate::anchor::AnchorProvider;
 use crate::cli::{
     Asset, AuthCommands, CardCommands, Cli, Commands, ConfigCommands, DebugCommands,
-    DepositCommands, Network, OutputFormat,
+    DepositCommands, Network, OnrampCommands, OutputFormat,
 };
 use crate::error::{AppError, ErrorCode};
 use crate::fee_contract::{
@@ -9,7 +10,7 @@ use crate::fee_contract::{
 use crate::horizon::HorizonProvider;
 use crate::models::{
     AuditEntry, CardRecord, CardState, Config, Credentials, Deposit, DepositState, FeePayment,
-    IdempotencyRecord, State, BASE_RESERVE_STROOPS,
+    IdempotencyRecord, OnrampRecord, State, BASE_RESERVE_STROOPS,
 };
 use crate::output::{emit_error, emit_success};
 use crate::providers::StripeProvider;
@@ -64,6 +65,7 @@ async fn run_inner(cli: Cli) -> Result<i32, (OutputFormat, AppError)> {
         Commands::Auth { command } => ctx.handle_auth(&command).await,
         Commands::Deposit { command } => ctx.handle_deposit(&command).await,
         Commands::Card { command } => ctx.handle_card(&command).await,
+        Commands::Onramp { command } => ctx.handle_onramp(&command).await,
         Commands::Balance => ctx.handle_balance().await,
         Commands::Config { command } => ctx.handle_config(&command).await,
         Commands::Debug { command } => ctx.handle_debug(&command).await,
@@ -128,6 +130,7 @@ impl AppContext {
                 "fee_fixed_cents": self.config.fee_fixed_cents,
                 "fee_variable_bps": self.config.fee_variable_bps,
                 "usdc_issuer": self.config.usdc_issuer(),
+                "anchor_home_domain": self.config.anchor_home_domain(),
             })),
         }
     }
@@ -136,50 +139,8 @@ impl AppContext {
         match command {
             DepositCommands::Address(args) => {
                 ensure_testnet(&self.config.network)?;
-                let existing = self.find_idempotent_resource("deposit_address");
-                if let Some(existing_id) = existing {
-                    let deposit = self.find_deposit(&existing_id)?;
-                    return Ok(json!(deposit_response(deposit)));
-                }
-                let keypair = StellarKeypair::generate();
-                let configured_keypair = self.configured_stellar_keypair().ok();
-                let address = configured_keypair
-                    .as_ref()
-                    .map(StellarKeypair::public)
-                    .unwrap_or_else(|| keypair.public());
-                let secret = configured_keypair
-                    .as_ref()
-                    .map(StellarKeypair::secret)
-                    .unwrap_or_else(|| keypair.secret());
-                let token_issuer = matches!(args.asset, Asset::Usdc)
-                    .then(|| self.config.usdc_issuer().to_string());
-                let deposit = Deposit {
-                    id: format!("dep_{}", short_id()),
-                    asset: args.asset.clone(),
-                    network: self.config.network.clone(),
-                    address,
-                    token_issuer,
-                    secret_key: secret,
-                    created_at: now(),
-                    status: DepositState::Pending,
-                    amount_native: "0".to_string(),
-                    amount_usd: "0.00".to_string(),
-                    fee_paid_stroops: 0,
-                    confirmed_at: None,
-                    last_transaction_hash: None,
-                };
-                let response = deposit_response(&deposit);
-                let deposit_id = deposit.id.clone();
-                self.state.deposits.push(deposit);
-                self.record_audit(
-                    "deposit.created",
-                    "deposit",
-                    &deposit_id,
-                    json!({"asset": asset_name(&args.asset)}),
-                );
-                self.record_idempotency("deposit_address", &deposit_id);
-                self.save_state()?;
-                Ok(json!(response))
+                let deposit = self.resolve_or_create_deposit(&args.asset)?;
+                Ok(json!(deposit_response(&deposit)))
             }
             DepositCommands::Status(args) => {
                 let deposit = self
@@ -464,6 +425,160 @@ impl AppContext {
         }
     }
 
+    async fn handle_onramp(&mut self, command: &OnrampCommands) -> Result<Value, AppError> {
+        match command {
+            OnrampCommands::Info => {
+                ensure_testnet(&self.config.network)?;
+                let info = self.anchor_provider().fetch_info().await?;
+                Ok(json!(info))
+            }
+            OnrampCommands::Start(args) => {
+                ensure_testnet(&self.config.network)?;
+                let deposit = match &args.deposit {
+                    Some(id) => self.find_deposit(id)?.clone(),
+                    None => self.resolve_or_create_deposit(&args.asset)?,
+                };
+                if deposit.asset != args.asset {
+                    return Err(AppError::new(
+                        ErrorCode::Usage,
+                        format!(
+                            "Deposit {} holds {} but --asset {} was requested",
+                            deposit.id,
+                            asset_name(&deposit.asset),
+                            asset_name(&args.asset)
+                        ),
+                    )
+                    .with_details(json!({
+                        "deposit_id": deposit.id,
+                        "deposit_asset": asset_name(&deposit.asset),
+                        "requested_asset": asset_name(&args.asset),
+                    }))
+                    .with_suggestion(format!(
+                        "Run: stellar-card deposit address --asset {}",
+                        asset_name(&args.asset)
+                    )));
+                }
+                let keypair = StellarKeypair::from_secret(&deposit.secret_key)?;
+                let info = self.anchor_provider().fetch_info().await?;
+                let provider = AnchorProvider::new(
+                    info.home_domain.clone(),
+                    Some(info.transfer_server_sep24.clone()),
+                    Some(info.web_auth_endpoint.clone()),
+                );
+                let jwt = provider
+                    .fetch_jwt(&deposit.address, &keypair, self.config.network_passphrase())
+                    .await?;
+                let asset_code = anchor_asset_code(&args.asset);
+                let started = provider
+                    .start_deposit(&jwt, asset_code, &deposit.address, args.amount.as_deref())
+                    .await?;
+                let record = OnrampRecord {
+                    id: format!("ramp_{}", short_id()),
+                    deposit_id: Some(deposit.id.clone()),
+                    account: deposit.address.clone(),
+                    anchor_home_domain: info.home_domain.clone(),
+                    anchor_sep24_url: info.transfer_server_sep24.clone(),
+                    web_auth_endpoint: info.web_auth_endpoint.clone(),
+                    asset_code: asset_code.to_string(),
+                    amount: args.amount.clone(),
+                    anchor_transaction_id: started.id.clone(),
+                    interactive_url: started.url.clone(),
+                    status: "incomplete".to_string(),
+                    stellar_transaction_id: None,
+                    created_at: now(),
+                    updated_at: now(),
+                };
+                let record_id = record.id.clone();
+                self.state.onramp_transactions.push(record);
+                self.record_audit(
+                    "onramp.started",
+                    "onramp",
+                    &record_id,
+                    json!({
+                        "deposit_id": deposit.id,
+                        "account": deposit.address,
+                        "asset_code": asset_code,
+                        "amount": args.amount,
+                        "anchor_home_domain": info.home_domain,
+                        "anchor_transaction_id": started.id,
+                        "interactive_url": started.url,
+                    }),
+                );
+                self.save_state()?;
+                Ok(json!({
+                    "id": record_id,
+                    "deposit_id": deposit.id,
+                    "account": deposit.address,
+                    "asset_code": asset_code,
+                    "amount": args.amount,
+                    "anchor_transaction_id": started.id,
+                    "interactive_url": started.url,
+                    "status": "incomplete",
+                    "home_domain": info.home_domain,
+                    "hint": format!("Complete KYC and funding in the interactive URL, then run: stellar-card onramp status {record_id}"),
+                }))
+            }
+            OnrampCommands::Status(args) => {
+                ensure_testnet(&self.config.network)?;
+                let record = self.find_onramp(&args.id)?.clone();
+                let deposit = match &record.deposit_id {
+                    Some(id) => self.find_deposit(id)?.clone(),
+                    None => {
+                        return Err(AppError::new(
+                            ErrorCode::Usage,
+                            "On-ramp record has no linked deposit account to re-authenticate with SEP-10",
+                        )
+                        .with_details(json!({"id": record.id})));
+                    }
+                };
+                let keypair = StellarKeypair::from_secret(&deposit.secret_key)?;
+                let provider = AnchorProvider::new(
+                    record.anchor_home_domain.clone(),
+                    Some(record.anchor_sep24_url.clone()),
+                    Some(record.web_auth_endpoint.clone()),
+                );
+                let jwt = provider
+                    .fetch_jwt(&deposit.address, &keypair, self.config.network_passphrase())
+                    .await?;
+                let transaction = provider
+                    .transaction_status(&jwt, &record.anchor_transaction_id)
+                    .await?;
+                {
+                    let stored = self.find_onramp_mut(&args.id)?;
+                    stored.status = transaction.status.clone();
+                    if let Some(stellar_transaction_id) = &transaction.stellar_transaction_id {
+                        stored.stellar_transaction_id = Some(stellar_transaction_id.clone());
+                    }
+                    stored.updated_at = now();
+                }
+                if transaction.status == "completed" {
+                    self.refresh_deposit(&deposit.id, false, 0).await?;
+                }
+                self.save_state()?;
+                let deposit_json = self.find_deposit(&deposit.id).ok().map(deposit_response);
+                let record = self.find_onramp(&args.id)?;
+                Ok(json!({
+                    "id": record.id,
+                    "deposit_id": record.deposit_id,
+                    "account": record.account,
+                    "asset_code": record.asset_code,
+                    "amount": record.amount,
+                    "anchor_transaction_id": record.anchor_transaction_id,
+                    "interactive_url": record.interactive_url,
+                    "status": transaction.status,
+                    "amount_in": transaction.amount_in,
+                    "amount_out": transaction.amount_out,
+                    "stellar_transaction_id": transaction.stellar_transaction_id,
+                    "external_transaction_id": transaction.external_transaction_id,
+                    "message": transaction.message,
+                    "home_domain": record.anchor_home_domain,
+                    "updated_at": record.updated_at,
+                    "deposit": deposit_json,
+                }))
+            }
+        }
+    }
+
     async fn handle_balance(&mut self) -> Result<Value, AppError> {
         self.refresh_all_pending_deposits().await?;
         Ok(json!({
@@ -541,9 +656,27 @@ impl AppContext {
                     }
                     "cardholder_name" => self.config.cardholder_name = args.value.clone(),
                     "cardholder_email" => self.config.cardholder_email = args.value.clone(),
+                    "anchor_home_domain" => {
+                        let value = args.value.trim();
+                        if value.is_empty() {
+                            return Err(AppError::new(
+                                ErrorCode::Usage,
+                                "anchor_home_domain must not be empty",
+                            ));
+                        }
+                        self.config.anchor_home_domain = Some(value.to_string());
+                    }
+                    "anchor_sep24_url" => {
+                        validate_http_url(&args.value)?;
+                        self.config.anchor_sep24_url = Some(args.value.clone());
+                    }
+                    "anchor_web_auth_endpoint" => {
+                        validate_http_url(&args.value)?;
+                        self.config.anchor_web_auth_endpoint = Some(args.value.clone());
+                    }
                     _ => {
                         return Err(AppError::new(ErrorCode::Usage, "Unsupported config key")
-                            .with_details(json!({"supported_keys": ["network", "format", "horizon_url", "rpc_url", "network_passphrase", "stripe_base_url", "coinbase_base_url", "stellar_private_key", "fee_contract_id", "onchain_fee_collection_enabled", "fee_fixed_cents", "fee_variable_bps", "xlm_price_usd", "usdc_issuer", "cardholder_name", "cardholder_email"]})))
+                            .with_details(json!({"supported_keys": ["network", "format", "horizon_url", "rpc_url", "network_passphrase", "stripe_base_url", "coinbase_base_url", "stellar_private_key", "fee_contract_id", "onchain_fee_collection_enabled", "fee_fixed_cents", "fee_variable_bps", "xlm_price_usd", "usdc_issuer", "cardholder_name", "cardholder_email", "anchor_home_domain", "anchor_sep24_url", "anchor_web_auth_endpoint"]})))
                     }
                 }
                 save_config(&self.paths, &self.config)?;
@@ -580,6 +713,14 @@ impl AppContext {
 
     fn soroban_provider(&self) -> SorobanProvider {
         SorobanProvider::new(self.config.rpc_url(), self.config.network_passphrase())
+    }
+
+    fn anchor_provider(&self) -> AnchorProvider {
+        AnchorProvider::new(
+            self.config.anchor_home_domain().to_string(),
+            self.config.anchor_sep24_url.clone(),
+            self.config.anchor_web_auth_endpoint.clone(),
+        )
     }
 
     fn resolve_api_key(&self) -> Result<String, AppError> {
@@ -842,6 +983,54 @@ impl AppContext {
         self.find_deposit(id)
     }
 
+    fn resolve_or_create_deposit(&mut self, asset: &Asset) -> Result<Deposit, AppError> {
+        if let Some(existing_id) = self.find_idempotent_resource("deposit_address") {
+            return Ok(self.find_deposit(&existing_id)?.clone());
+        }
+        let deposit = self.new_deposit(asset);
+        self.record_audit(
+            "deposit.created",
+            "deposit",
+            &deposit.id,
+            json!({"asset": asset_name(asset)}),
+        );
+        self.record_idempotency("deposit_address", &deposit.id);
+        self.save_state()?;
+        Ok(deposit)
+    }
+
+    fn new_deposit(&mut self, asset: &Asset) -> Deposit {
+        let keypair = StellarKeypair::generate();
+        let configured_keypair = self.configured_stellar_keypair().ok();
+        let address = configured_keypair
+            .as_ref()
+            .map(StellarKeypair::public)
+            .unwrap_or_else(|| keypair.public());
+        let secret = configured_keypair
+            .as_ref()
+            .map(StellarKeypair::secret)
+            .unwrap_or_else(|| keypair.secret());
+        let token_issuer =
+            matches!(asset, Asset::Usdc).then(|| self.config.usdc_issuer().to_string());
+        let deposit = Deposit {
+            id: format!("dep_{}", short_id()),
+            asset: asset.clone(),
+            network: self.config.network.clone(),
+            address,
+            token_issuer,
+            secret_key: secret,
+            created_at: now(),
+            status: DepositState::Pending,
+            amount_native: "0".to_string(),
+            amount_usd: "0.00".to_string(),
+            fee_paid_stroops: 0,
+            confirmed_at: None,
+            last_transaction_hash: None,
+        };
+        self.state.deposits.push(deposit.clone());
+        deposit
+    }
+
     fn available_balance_cents(&self) -> i64 {
         let credits: i64 = self
             .state
@@ -884,6 +1073,33 @@ impl AppContext {
                 AppError::new(
                     ErrorCode::ResourceNotFound,
                     format!("Deposit {id} not found"),
+                )
+            })
+    }
+
+    fn find_onramp(&self, id: &str) -> Result<&OnrampRecord, AppError> {
+        self.state
+            .onramp_transactions
+            .iter()
+            .find(|record| record.id == id || record.anchor_transaction_id == id)
+            .ok_or_else(|| {
+                AppError::new(
+                    ErrorCode::ResourceNotFound,
+                    format!("On-ramp transaction {id} not found"),
+                )
+                .with_suggestion("Run: stellar-card onramp start --asset usdc")
+            })
+    }
+
+    fn find_onramp_mut(&mut self, id: &str) -> Result<&mut OnrampRecord, AppError> {
+        self.state
+            .onramp_transactions
+            .iter_mut()
+            .find(|record| record.id == id || record.anchor_transaction_id == id)
+            .ok_or_else(|| {
+                AppError::new(
+                    ErrorCode::ResourceNotFound,
+                    format!("On-ramp transaction {id} not found"),
                 )
             })
     }
@@ -991,6 +1207,27 @@ fn asset_name(asset: &Asset) -> &'static str {
         Asset::Xlm => "xlm",
         Asset::Usdc => "usdc",
     }
+}
+
+fn anchor_asset_code(asset: &Asset) -> &'static str {
+    match asset {
+        Asset::Xlm => "native",
+        Asset::Usdc => "USDC",
+    }
+}
+
+fn validate_http_url(value: &str) -> Result<(), AppError> {
+    let url = reqwest::Url::parse(value).map_err(|_| {
+        AppError::new(ErrorCode::Usage, format!("Invalid URL: {value}"))
+            .with_details(json!({"value": value}))
+    })?;
+    if !matches!(url.scheme(), "http" | "https") {
+        return Err(
+            AppError::new(ErrorCode::Usage, "URL must use the http or https scheme")
+                .with_details(json!({"value": value, "scheme": url.scheme()})),
+        );
+    }
+    Ok(())
 }
 
 fn network_name(network: &Network) -> &'static str {

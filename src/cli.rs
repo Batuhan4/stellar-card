@@ -61,6 +61,10 @@ pub enum Commands {
         #[command(subcommand)]
         command: CardCommands,
     },
+    Onramp {
+        #[command(subcommand)]
+        command: OnrampCommands,
+    },
     Balance,
     Config {
         #[command(subcommand)]
@@ -140,6 +144,28 @@ pub struct CardFreezeArgs {
     pub confirm: bool,
     #[arg(long, default_value_t = false)]
     pub dry_run: bool,
+}
+
+#[derive(Debug, Subcommand, Clone)]
+pub enum OnrampCommands {
+    Info,
+    Start(OnrampStartArgs),
+    Status(OnrampStatusArgs),
+}
+
+#[derive(Debug, Args, Clone)]
+pub struct OnrampStartArgs {
+    #[arg(long, value_enum, default_value_t = Asset::Usdc)]
+    pub asset: Asset,
+    #[arg(long)]
+    pub amount: Option<String>,
+    #[arg(long)]
+    pub deposit: Option<String>,
+}
+
+#[derive(Debug, Args, Clone)]
+pub struct OnrampStatusArgs {
+    pub id: String,
 }
 
 #[derive(Debug, Subcommand, Clone)]

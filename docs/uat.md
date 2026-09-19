@@ -81,14 +81,49 @@ A second full run confirmed the flow is repeatable, not a one-off:
 `frozen` with a `frozen_at` timestamp, and `card list` reported both cards with
 their live Stripe statuses.
 
-## Repository test coverage (offline)
-`cargo test --workspace` runs 54 tests with no network access:
+## On-ramp (SEP-1/SEP-10/SEP-24) — live reference anchor
 
-- 33 library unit tests (`src/`): fee math, classic transaction build/sign/verify,
+Verified live on 2026-09-20 against SDF's testnet reference anchor
+`testanchor.stellar.org` (real SEP-1 fetch, real SEP-10 signed challenge, real
+SEP-24 interactive deposit):
+
+| Item | Value |
+|---|---|
+| Anchor | `testanchor.stellar.org` |
+| `onramp info` currencies | `SRT`, `USDC`, `native` (all `status=test`) |
+| SEP-24 server | `https://testanchor.stellar.org/sep24` |
+| Web auth endpoint | `https://testanchor.stellar.org/auth` |
+| Deposit id | `dep_462e642f242f` |
+| Account | `GC5XXIANNGOZUDRRDHYCPCGA5OLTONAHTYVSDQZB6FFRM2COLNFDCFPK` |
+| Anchor transaction id | `3d5171b7-e5b2-4d83-9e77-108c7c5a35d1` |
+| Amount / asset | `10` / `USDC` |
+| Interactive URL | `https://anchor-ref-ui-testanchor.stellar.org?transaction_id=3d5171b7-...&token=<redacted>` |
+| Status at handoff | `incomplete` (KYC/funding is a browser step by design) |
+
+Notes:
+
+- The anchor caps each asset at `max_amount: 10` and reports
+  `account_creation: false`, so the deposit account must be funded and (for USDC)
+  hold a trustline before completion.
+- The `completed` → credited-deposit branch is covered by the offline integration
+  tests (`tests/onramp_flow.rs`); completing KYC live requires a human browser
+  session.
+- **TRY**: no publicly documented TRY-capable Stellar anchor exists — on mainnet
+  or testnet — as of the 2026-09-19 research (SDF directory has no TRY SEP asset;
+  KB Trading TRYB is test-status and not in SEP asset lists; BiLira publishes no
+  Stellar TOML). The client is anchor-agnostic: `anchor_home_domain`,
+  `anchor_sep24_url`, and `anchor_web_auth_endpoint` can point at any SEP-24
+  anchor without code changes.
+
+## Repository test coverage (offline)
+`cargo test --workspace` runs 66 tests with no network access:
+
+- 42 library unit tests (`src/`): fee math, classic transaction build/sign/verify,
   Horizon parsing and deposit observation, Soroban simulate/assemble/sign/send
-  assembly, wiremock provider errors.
-- 8 integration tests (`tests/`): end-to-end CLI flows against mocked Stripe,
-  Horizon, Coinbase, and Soroban RPC, including the on-chain fee path.
+  assembly, SEP-1/10/24 anchor flows, wiremock provider errors.
+- 11 integration tests (`tests/`): end-to-end CLI flows against mocked Stripe,
+  Horizon, Coinbase, Soroban RPC, and anchor endpoints, including the on-chain
+  fee path and the on-ramp flow.
 - 13 Soroban contract tests (`contracts/fee-vault`): initialization, auth,
   collection, withdrawal, pricing validation, and error paths.
 

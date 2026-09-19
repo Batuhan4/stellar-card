@@ -129,18 +129,7 @@ pub fn sign_transaction(
             format!("Failed to hash transaction: {error}"),
         )
     })?;
-    let signature = signer.signing.sign(&tx_hash);
-    let mut hint = [0u8; 4];
-    hint.copy_from_slice(&signer.public_bytes()[28..32]);
-    let decorated =
-        DecoratedSignature {
-            hint: SignatureHint(hint),
-            signature: Signature(
-                signature.to_bytes().to_vec().try_into().map_err(|_| {
-                    AppError::new(ErrorCode::General, "Signature length is invalid")
-                })?,
-            ),
-        };
+    let decorated = make_signature(signer, &tx_hash)?;
     let envelope = TransactionV1Envelope {
         tx: transaction,
         signatures: vec![decorated].try_into().map_err(|_| {
@@ -148,6 +137,54 @@ pub fn sign_transaction(
         })?,
     };
     Ok(TransactionEnvelope::Tx(envelope))
+}
+
+pub fn sign_envelope(
+    envelope: TransactionEnvelope,
+    signer: &StellarKeypair,
+    passphrase: &str,
+) -> Result<TransactionEnvelope, AppError> {
+    match envelope {
+        TransactionEnvelope::Tx(mut inner) => {
+            let id = network_id(passphrase);
+            let tx_hash = inner.tx.hash(id).map_err(|error| {
+                AppError::new(
+                    ErrorCode::General,
+                    format!("Failed to hash transaction: {error}"),
+                )
+            })?;
+            let decorated = make_signature(signer, &tx_hash)?;
+            let mut signatures = inner.signatures.to_vec();
+            signatures.push(decorated);
+            inner.signatures = signatures.try_into().map_err(|_| {
+                AppError::new(ErrorCode::General, "Signature count exceeds envelope limit")
+            })?;
+            Ok(TransactionEnvelope::Tx(inner))
+        }
+        _ => Err(AppError::new(
+            ErrorCode::Usage,
+            "Only v1 transaction envelopes can be signed",
+        )),
+    }
+}
+
+fn make_signature(
+    signer: &StellarKeypair,
+    tx_hash: &[u8; 32],
+) -> Result<DecoratedSignature, AppError> {
+    let signature = signer.signing.sign(tx_hash);
+    let mut hint = [0u8; 4];
+    hint.copy_from_slice(&signer.public_bytes()[28..32]);
+    Ok(DecoratedSignature {
+        hint: SignatureHint(hint),
+        signature: Signature(
+            signature
+                .to_bytes()
+                .to_vec()
+                .try_into()
+                .map_err(|_| AppError::new(ErrorCode::General, "Signature length is invalid"))?,
+        ),
+    })
 }
 
 pub fn envelope_base64(envelope: &TransactionEnvelope) -> Result<String, AppError> {

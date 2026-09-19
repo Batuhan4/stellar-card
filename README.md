@@ -35,6 +35,12 @@ agent or a developer script can run the whole flow without touching a UI.
 - 🧩 **Composable by design.** CLI, Soroban contract, and web dashboard are
   independent: point the CLI at any deployed vault, invoke the contract from any
   client, or drive the dashboard with Freighter.
+- 🏦 **On-ramp ready (SEP-10/SEP-24).** A real anchor client is implemented and
+  was verified live against SDF's testnet reference anchor — SEP-1 discovery,
+  SEP-10 signed-challenge auth, and an interactive SEP-24 deposit that lands in
+  the same address the card is funded from. TRY is a counterparty gap, not a code
+  gap: no publicly documented TRY anchor exists yet, and the moment one does,
+  `config set anchor_home_domain` points the CLI at it with no code changes.
 - 🛡️ **Honest boundaries.** Not a bank, custodian, exchange, anchor, or KYC
   provider. Testnet only, no yield claims, secrets never leave the local state
   directory with `0600` permissions.
@@ -123,6 +129,9 @@ Or run the whole flow in one shot:
 | `card buy --amount <USD>` | Collect the fee on-chain and create a Stripe virtual card |
 | `card show <id>` | Reveal available card details |
 | `card list` / `card freeze <id> --confirm` | List or freeze cards |
+| `onramp info` | List the anchor's SEP-24 currencies and endpoints |
+| `onramp start [--asset usdc\|xlm] [--amount N] [--deposit <id>]` | Start an anchor deposit (SEP-10 + SEP-24) |
+| `onramp status <ramp_id>` | Poll the anchor deposit and credit the linked deposit when completed |
 | `balance` | Available balance in USD |
 | `config set <key> <value>` | Update configuration |
 
@@ -132,7 +141,8 @@ Global flags: `--format json|table|plain`, `--network testnet|mainnet`,
 Config keys: `network`, `format`, `horizon_url`, `rpc_url`, `network_passphrase`,
 `stripe_base_url`, `coinbase_base_url`, `stellar_private_key`, `fee_contract_id`,
 `onchain_fee_collection_enabled`, `fee_fixed_cents`, `fee_variable_bps`,
-`xlm_price_usd`, `usdc_issuer`, `cardholder_name`, `cardholder_email`.
+`xlm_price_usd`, `usdc_issuer`, `anchor_home_domain`, `anchor_sep24_url`,
+`anchor_web_auth_endpoint`, `cardholder_name`, `cardholder_email`.
 
 ## 📜 Soroban fee vault
 
@@ -153,6 +163,55 @@ stellar contract build --package stellar-card-fee-vault
 STELLAR_ACCOUNT=<identity> ./scripts/deploy-fee-vault.sh
 ```
 
+## 🏦 On-ramp (SEP-24)
+
+`stellar-card` ships an anchor-agnostic fiat on-ramp client:
+
+- **SEP-1** — reads `/.well-known/stellar.toml` for endpoints and supported currencies.
+- **SEP-10** — signs the anchor's challenge transaction with the deposit key and
+  exchanges it for a JWT (`sign_envelope`, real ed25519 signatures).
+- **SEP-24** — opens an interactive deposit at the anchor and polls its status.
+
+```bash
+stellar-card onramp info                       # anchor currencies + endpoints
+stellar-card onramp start --asset usdc --amount 10
+# → interactive_url: complete KYC/funding in the browser
+stellar-card onramp status ramp_...            # pending → completed
+stellar-card deposit status <dep-id>           # credited once funds arrive
+stellar-card card buy --amount 5.00            # spend it
+```
+
+Live testnet verification (2026-09-20) against SDF's reference anchor
+`testanchor.stellar.org`: `onramp info` returned SRT, USDC, and native with the
+SEP-24 and auth endpoints; `onramp start --asset usdc --amount 10` produced a
+real anchor transaction (`3d5171b7-e5b2-4d83-9e77-108c7c5a35d1`) and an
+interactive URL; `onramp status` reported `incomplete` with the linked deposit
+pending. The anchor's per-asset max is 10, and completion is a browser KYC step
+by design — full evidence in [`docs/uat.md`](docs/uat.md).
+
+### TRY on-ramp readiness
+
+There is **no publicly documented TRY-capable Stellar anchor** — not on mainnet
+and not on testnet — as of the verified research date (2026-09-19):
+
+- The SDF anchor directory lists no TRY/TRYB asset with SEP-6/SEP-24 enabled.
+- KB Trading's TRYB is status `test` and is not enabled in its SEP asset lists.
+- BiLira issues TRYB on EVM/Solana and publishes no Stellar `stellar.toml`.
+- SDF's testnet reference anchor supports SRT, USDC, and native only.
+
+So the demo on-ramps USDC on testnet, and **any TRY anchor that appears works
+with zero code changes**:
+
+```bash
+stellar-card config set anchor_home_domain <try-anchor-domain>
+stellar-card config set anchor_sep24_url <https://.../sep24>          # if not in the TOML
+stellar-card config set anchor_web_auth_endpoint <https://.../auth>   # if not in the TOML
+stellar-card onramp info
+```
+
+The missing piece is a licensed counterparty, not the integration. This boundary
+is deliberate: StellarCard never pretends to be an anchor or custodian.
+
 ## 🖥️ Web demo
 
 A Next.js dashboard with Freighter wallet connection lives in [`web/`](web/).
@@ -170,7 +229,7 @@ npm run dev
 ## 🧪 Testing
 
 ```bash
-cargo test --workspace   # 54 offline tests: unit, CLI integration, contract
+cargo test --workspace   # 66 offline tests: unit, CLI integration, contract
 cargo clippy --workspace --all-targets -- -D warnings
 cargo fmt --all --check
 npm --prefix web run build && npm --prefix web run lint
@@ -197,9 +256,10 @@ npm --prefix web run build && npm --prefix web run lint
 Built for the Stellar Pro Hackathon 2026, Genesis Track.
 
 - The Stellar integration is real and live on testnet: Horizon for deposits and
-  balances, Friendbot for funding, classic transactions for trustlines, and a
-  deployed Soroban contract for fee collection (links above). Nothing in the
-  testnet flows is simulated.
+  balances, Friendbot for funding, classic transactions for trustlines, a
+  deployed Soroban contract for fee collection, and a SEP-10/SEP-24 on-ramp
+  verified against SDF's reference anchor (links above). Nothing in the testnet
+  flows is simulated.
 - AI skills used during development, disclosed per event expectations:
   - [`stellar/stellar-dev-skill`](https://github.com/stellar/stellar-dev-skill)
     — dapp module (Apache-2.0), reference for wallet connection,
@@ -219,6 +279,7 @@ Built for the Stellar Pro Hackathon 2026, Genesis Track.
 stellar-card/
 ├── src/                    # Rust CLI
 │   ├── app.rs              # command handlers
+│   ├── anchor.rs           # SEP-1/SEP-10/SEP-24 anchor client (on-ramp)
 │   ├── horizon.rs          # Horizon client and deposit observation
 │   ├── soroban.rs          # Soroban simulate/assemble/sign/send
 │   ├── tx.rs               # Stellar keypairs, classic transactions, signing

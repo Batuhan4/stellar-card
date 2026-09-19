@@ -11,6 +11,7 @@ pub const MAINNET_PASSPHRASE: &str = "Public Global Stellar Network ; September 
 pub const TESTNET_USDC_ISSUER: &str = "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5";
 pub const COINBASE_API_URL: &str = "https://api.coinbase.com";
 pub const BASE_RESERVE_STROOPS: i64 = 500_000;
+pub const DEFAULT_ANCHOR_HOME_DOMAIN: &str = "testanchor.stellar.org";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
@@ -32,6 +33,9 @@ pub struct Config {
     pub usdc_issuer: Option<String>,
     pub cardholder_name: String,
     pub cardholder_email: String,
+    pub anchor_home_domain: Option<String>,
+    pub anchor_sep24_url: Option<String>,
+    pub anchor_web_auth_endpoint: Option<String>,
 }
 
 impl Default for Config {
@@ -54,6 +58,9 @@ impl Default for Config {
             usdc_issuer: None,
             cardholder_name: "StellarCard Demo User".to_string(),
             cardholder_email: "demo@stellar-card.dev".to_string(),
+            anchor_home_domain: None,
+            anchor_sep24_url: None,
+            anchor_web_auth_endpoint: None,
         }
     }
 }
@@ -98,6 +105,12 @@ impl Config {
             .as_deref()
             .unwrap_or(COINBASE_API_URL)
     }
+
+    pub fn anchor_home_domain(&self) -> &str {
+        self.anchor_home_domain
+            .as_deref()
+            .unwrap_or(DEFAULT_ANCHOR_HOME_DOMAIN)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -115,6 +128,8 @@ pub struct State {
     pub fee_payments: Vec<FeePayment>,
     pub audit_log: Vec<AuditEntry>,
     pub idempotency_keys: Vec<IdempotencyRecord>,
+    #[serde(default)]
+    pub onramp_transactions: Vec<OnrampRecord>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -213,4 +228,22 @@ pub struct IdempotencyRecord {
     pub operation: String,
     pub resource_id: String,
     pub created_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OnrampRecord {
+    pub id: String,
+    pub deposit_id: Option<String>,
+    pub account: String,
+    pub anchor_home_domain: String,
+    pub anchor_sep24_url: String,
+    pub web_auth_endpoint: String,
+    pub asset_code: String,
+    pub amount: Option<String>,
+    pub anchor_transaction_id: String,
+    pub interactive_url: String,
+    pub status: String,
+    pub stellar_transaction_id: Option<String>,
+    pub created_at: String,
+    pub updated_at: String,
 }

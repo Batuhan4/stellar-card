@@ -125,7 +125,27 @@ Coinbase spot price with `xlm_price_usd` as fallback, then invokes `collect_fee`
 the vault. It needs either a funded configured wallet or a confirmed XLM deposit
 with enough balance for the fee plus the base reserve.
 
-## Step 5 — Create a deposit address
+## Step 5 — Optional: fiat on-ramp (SEP-24)
+
+Start a fiat deposit at a Stellar anchor and have the funds land in a stellar-card
+deposit address. The CLI is anchor-agnostic; it defaults to SDF's testnet
+reference anchor (`testanchor.stellar.org`, assets SRT/USDC/native).
+
+```bash
+stellar-card onramp info
+stellar-card onramp start --asset usdc --amount 10
+# → returns interactive_url; the user completes KYC/funding in the browser
+stellar-card onramp status ramp_...            # poll until "completed"
+stellar-card deposit status dep_...            # credits the balance
+```
+
+Rules: never invent an anchor transaction id or interactive URL; relay only what
+the anchor returned. The anchor's limits apply (testanchor caps each asset at 10).
+TRY is not available at any publicly documented Stellar anchor yet — do not claim
+a TRY ramp; instead set `anchor_home_domain` to a TRY-capable anchor when one
+exists, or report the counterparty gap.
+
+## Step 6 — Create a deposit address
 
 ```bash
 stellar-card deposit address --asset xlm
@@ -135,7 +155,7 @@ stellar-card deposit address --asset usdc
 Use `--idempotency-key <key>` to make retries safe; the same key returns the same
 deposit. Capture `data.id` (for example `dep_...`) and `data.address` (`G...`).
 
-## Step 6 — Fund the deposit on testnet
+## Step 7 — Fund the deposit on testnet
 
 ```bash
 stellar-card deposit fund dep_...
@@ -151,7 +171,7 @@ stellar-card deposit trustline dep_...
 Send testnet XLM or USDC to the deposit address from any testnet wallet to create
 a real deposit observation.
 
-## Step 7 — Track the deposit
+## Step 8 — Track the deposit
 
 ```bash
 stellar-card deposit status dep_... --wait --timeout 300
@@ -161,7 +181,7 @@ Exit code `10` (`DEPOSIT_PENDING`) means not yet observed; JSON is still returne
 `status: "confirmed"` with a positive `amount_usd` means the deposit is credited.
 `last_transaction_hash` is the Stellar transaction hash to report.
 
-## Step 8 — Buy a card
+## Step 9 — Buy a card
 
 ```bash
 stellar-card balance
@@ -174,7 +194,7 @@ a card summary including `data.id` (`crd_...`), `stripe_card_id`, `last4`, `bran
 expiry, status, and the fee breakdown. When on-chain fee collection ran, the
 response also includes `fee_payment.transaction_hash` and `fee_stroops`.
 
-## Step 9 — Reveal the card
+## Step 10 — Reveal the card
 
 ```bash
 stellar-card card show crd_...
@@ -185,7 +205,7 @@ The response nests the summary and adds `number`, `cvc`, and
 return PAN/CVC; report the reason and give last4, brand, and expiry instead. Do not
 print sensitive fields into logs or store them.
 
-## Step 10 — Freeze the card (only when asked)
+## Step 11 — Freeze the card (only when asked)
 
 ```bash
 stellar-card card freeze crd_... --confirm
@@ -195,7 +215,7 @@ Without `--confirm` the command refuses. Use `--dry-run` to preview without
 calling Stripe (combine with `--confirm`). Freezing returns the updated card with
 status `frozen` and `frozen_at`.
 
-## Step 11 — Report results
+## Step 12 — Report results
 
 Summarize: deposit id, card id, status, last4/brand/expiry, fee USD and stroops,
 and the transactions below. Build links from real values only:
@@ -219,6 +239,7 @@ and the transactions below. Build links from real values only:
 | `card buy --amount <USD>` | Buy a virtual card |
 | `card show <id>` | Reveal card details if available |
 | `card list` / `card freeze <id> --confirm` | List / freeze cards |
+| `onramp info` / `onramp start [--asset] [--amount] [--deposit]` / `onramp status <id>` | Anchor SEP-24 fiat on-ramp |
 | `balance` | Available USD balance and counters |
 | `config set <key> <value>` | Persist configuration |
 
