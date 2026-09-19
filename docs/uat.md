@@ -81,6 +81,18 @@ A second full run confirmed the flow is repeatable, not a one-off:
 `frozen` with a `frozen_at` timestamp, and `card list` reported both cards with
 their live Stripe statuses.
 
+## USDC trustline (classic transaction, live)
+
+`deposit address --asset usdc` → `deposit fund` → `deposit trustline` was also
+exercised live, proving the classic transaction build/sign/submit path:
+
+| Item | Value |
+|---|---|
+| Deposit id | `dep_ca3159bf5a0f` |
+| Address | `GASCEZZBGNUDP333XUPFGX25XNWHD2HD64CG6FQZO2GMN2BCJUL34EKZ` |
+| Funding tx (Friendbot) | `63d36c5082b8fbbfba472ca45bc93a2a45d8080a258fc86f9eb654d2cd24c5f4` |
+| Trustline tx (ChangeTrust USDC) | `abf56d29557e486c644a571945f9a8adecaaad01e2a184c3711d2919a882c0d5` (ledger `4771579`, successful) |
+
 ## On-ramp (SEP-1/SEP-10/SEP-24) — live reference anchor
 
 Verified live on 2026-09-20 against SDF's testnet reference anchor
