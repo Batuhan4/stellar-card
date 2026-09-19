@@ -101,21 +101,24 @@ stellar-card config set xlm_price_usd 0.20
 stellar-card config set usdc_issuer GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5
 ```
 
-## Step 4 — Optional: enable the Soroban fee vault
+## Step 4 — Enable the Soroban fee vault
 
-The fee vault contract (`contracts/fee-vault`) may not be deployed yet. Only enable
-it with a contract id that was actually deployed and recorded.
+The fee vault is deployed on Stellar testnet:
+
+- Contract: `CACWNJ65VRCHKMGZSIGRH775ZU6S3C7MGAFVIKPBMVIJ62NIXVEXGVQQ`
+- State: `fee_bps=20`, `fixed_fee_cents=10`, authority `GBG5IH4QGSIV7HTEOVGXOV7DEWZVRNXWA57FI4NT6PEZVNGAKRW23SJN`
 
 ```bash
-# Replace with the deployed C... address; do not invent one
-stellar-card config set fee_contract_id <TESTNET_FEE_VAULT_CONTRACT_ID>
+stellar-card config set fee_contract_id CACWNJ65VRCHKMGZSIGRH775ZU6S3C7MGAFVIKPBMVIJ62NIXVEXGVQQ
 stellar-card config set onchain_fee_collection_enabled true
 stellar-card config set fee_fixed_cents 10
 stellar-card config set fee_variable_bps 20
 ```
 
-If no deployment exists, leave `onchain_fee_collection_enabled false`, continue in
-off-chain fee-accounting mode, and report the missing contract as a blocker.
+Never invent a contract id. If you deploy a new vault with
+`scripts/deploy-fee-vault.sh`, use the id that script prints, and report the
+deploy and initialize transaction hashes.
+
 
 When enabled, `card buy` quotes `fixed $0.10 + 0.20%` in XLM using the live
 Coinbase spot price with `xlm_price_usd` as fallback, then invokes `collect_fee` on

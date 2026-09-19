@@ -62,8 +62,26 @@ PAN/CVC are not exposed by Stripe Issuing test mode for virtual cards; the
 `card show` command returns the fields Stripe makes available and records the
 reason in `reveal_unavailable_reason`.
 
-## Repository test coverage (offline)
+## Repeatability run (same day, second deposit)
 
+A second full run confirmed the flow is repeatable, not a one-off:
+
+| Item | Value |
+|---|---|
+| Deposit id | `dep_c198d13dbb13` |
+| Address | `GBNFK4GGHIP7W7UXEGGYIXP2LDJSZII324UJ77T3ZRIWS557RZ6GWTNG` |
+| Funding tx (Friendbot) | `18691cda791e92bc968e8ac47d2fc8de58a9a282727a2564850d6398c193ed58` |
+| Observed | `10000.0000000` XLM = `$1900.00` |
+| Card | Visa `last4=0161`, exp `05/2029`, Stripe id `ic_1UHd7REAzMrENaFXiKe51gGs` |
+| Fee tx | `8f841537d4215ccb084b8f49a32df31d33e9f55dd34c9df14ae82a5f85bda66c` |
+| Fee charged | `5789474` stroops |
+| Vault after run | `payment_count=2`, `total_collected=11578948`, `total_withdrawn=0` |
+
+`card show` returned the test-mode PAN/CVC, `card freeze --confirm` set status
+`frozen` with a `frozen_at` timestamp, and `card list` reported both cards with
+their live Stripe statuses.
+
+## Repository test coverage (offline)
 `cargo test --workspace` runs 54 tests with no network access:
 
 - 33 library unit tests (`src/`): fee math, classic transaction build/sign/verify,
