@@ -1,0 +1,63 @@
+[workspace]
+resolver = "2"
+members = [".", "contracts/fee-vault"]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+rust-version = "1.84"
+
+[workspace.dependencies]
+soroban-sdk = "28.0.0"
+
+[package]
+name = "stellar-card"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+description = "Agent-first virtual card CLI funded by Stellar testnet"
+default-run = "stellar-card"
+
+[[bin]]
+name = "stellar-card"
+path = "src/main.rs"
+
+[lib]
+name = "stellar_card"
+path = "src/lib.rs"
+
+[dependencies]
+base64 = "0.22"
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4.5", features = ["derive"] }
+directories = "6.0.0"
+ed25519-dalek = "2.2"
+getrandom = "0.2"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+stellar-strkey = "0.0.18"
+stellar-xdr = { version = "28.0.0", features = ["base64"] }
+thiserror = "2.0"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
+toml = "0.8"
+uuid = { version = "1", features = ["v4", "serde"] }
+
+[dev-dependencies]
+assert_cmd = "2.1"
+predicates = "3.1"
+tempfile = "3.20"
+wiremock = "0.6"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true

@@ -1,0 +1,16 @@
+[package]
+name = "stellar-card-fee-vault"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT"
+description = "On-chain XLM fee vault for the Stellar Card CLI"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

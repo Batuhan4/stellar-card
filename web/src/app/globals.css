@@ -1,0 +1,275 @@
+@import "tailwindcss";
+
+/* ===== Light Mode Design System (Stitch Crab Edition) ===== */
+@theme inline {
+  --color-primary: #0043eb;
+  --color-primary-container: #3962ff;
+  --color-primary-fixed: #dde1ff;
+  --color-primary-fixed-dim: #b8c3ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #f9f7ff;
+  --color-on-primary-fixed: #001356;
+  --color-on-primary-fixed-variant: #0035be;
+
+  --color-secondary: #6b38d4;
+  --color-secondary-container: #8455ef;
+  --color-secondary-fixed: #e9ddff;
+  --color-secondary-fixed-dim: #d0bcff;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #fffbff;
+
+  --color-tertiary: #006274;
+  --color-tertiary-container: #007d92;
+  --color-tertiary-fixed: #acedff;
+  --color-tertiary-fixed-dim: #4cd7f6;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #edfaff;
+
+  --color-surface: #f8f9fb;
+  --color-surface-dim: #d9dadc;
+  --color-surface-bright: #f8f9fb;
+  --color-surface-container: #edeef0;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container-high: #e7e8ea;
+  --color-surface-container-highest: #e1e2e4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-variant: #e1e2e4;
+  --color-surface-tint: #124af0;
+
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #424656;
+  --color-on-background: #191c1e;
+  --color-background: #f8f9fb;
+  --color-outline: #727687;
+  --color-outline-variant: #c2c6d8;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-inverse-surface: #2e3132;
+  --color-inverse-on-surface: #f0f1f3;
+  --color-inverse-primary: #b8c3ff;
+
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-label: "Space Grotesk", sans-serif;
+}
+
+/* ===== Entrance Animations (one-shot) ===== */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translate3d(0, 30px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translate3d(30px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translate3d(-30px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* ===== Crab Animations (from Stitch) ===== */
+@keyframes crab-reveal {
+  0%, 40% { transform: translateY(100px) scale(0); opacity: 0; }
+  50% { transform: translateY(-40px) scale(1.1); opacity: 1; }
+  60% { transform: translateY(0) translateX(-60px) rotate(-10deg); opacity: 1; }
+  100% { transform: translateY(0) translateX(-80px) rotate(-15deg); opacity: 1; }
+}
+
+@keyframes crab-idle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-5px) scale(1.02); }
+}
+
+@keyframes crab-happy {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+@keyframes crab-cheer {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.05); }
+}
+
+@keyframes claw-tap {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-10deg); }
+}
+
+@keyframes crab-peek {
+  0% { transform: translateY(100%) scale(0.5); opacity: 0; }
+  50% { transform: translateY(-20px) scale(1.1); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* ===== 3D Card Animations (from Stitch) ===== */
+@keyframes float-gentle {
+  0%, 100% { transform: translate(0, 0) rotateX(0deg) rotateY(0deg); }
+  25% { transform: translate(10px, -15px) rotateX(2deg) rotateY(-2deg); }
+  50% { transform: translate(-5px, 10px) rotateX(-1deg) rotateY(3deg); }
+  75% { transform: translate(-12px, -8px) rotateX(1deg) rotateY(-1deg); }
+}
+
+@keyframes card-rotation-sequence {
+  0% { transform: rotateY(0deg) rotateX(0deg); }
+  20% { transform: rotateY(180deg) scale(0.9); }
+  40% { transform: rotateY(360deg) scale(1); }
+  100% { transform: rotateY(360deg); }
+}
+
+@keyframes boomerang-throw {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  15% { transform: translate(200px, -150px) rotate(360deg) scale(0.6); opacity: 1; }
+  30% { transform: translate(400px, -50px) rotate(720deg) scale(0.4); opacity: 0.8; }
+  50% { transform: translate(150px, 100px) rotate(1080deg) scale(0.5); opacity: 1; }
+  70% { transform: translate(-50px, 50px) rotate(1440deg) scale(0.8); opacity: 1; }
+  85% { transform: translate(-20px, 10px) rotate(1800deg) scale(1); opacity: 1; }
+  100% { transform: translate(0, 0) rotate(2160deg) scale(1); opacity: 1; }
+}
+
+@keyframes card-float {
+  0%, 100% { transform: translateY(0) rotate(5deg); }
+  50% { transform: translateY(-15px) rotate(-5deg); }
+}
+
+@keyframes card-victory {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  50% { transform: translate(20px, -40px) rotate(180deg); opacity: 1; }
+  100% { transform: translate(0, 0) rotate(360deg); opacity: 1; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(.8); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.2; }
+  100% { transform: scale(.8); opacity: 0.5; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Animation Utility Classes ===== */
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out both; }
+.animate-fade-in { animation: fade-in 0.5s ease-out both; }
+.animate-scale-in { animation: scale-in 0.5s ease-out both; }
+.animate-slide-in-right { animation: slide-in-right 0.5s ease-out both; }
+.animate-slide-in-left { animation: slide-in-left 0.5s ease-out both; }
+
+/* Crab animation classes */
+.animate-crab-reveal { animation: crab-reveal 12s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; pointer-events: none; }
+.animate-crab-idle { animation: crab-idle 3s ease-in-out infinite; }
+.animate-crab-happy { animation: crab-happy 0.6s infinite alternate; }
+.animate-crab-cheer { animation: crab-cheer 0.6s ease-in-out infinite; }
+.animate-claw-tap { animation: claw-tap 0.4s ease-in-out infinite; }
+.animate-crab-peek { animation: crab-peek 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* Card & 3D animation classes */
+.animate-float-3d {
+  animation: float-gentle 8s ease-in-out infinite;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+.animate-card-rotation {
+  animation: card-rotation-sequence 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-style: preserve-3d;
+}
+.animate-boomerang { animation: boomerang-throw 5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; animation-delay: 6s; }
+.animate-card-float { animation: card-float 4s ease-in-out infinite; }
+.animate-card-victory { animation: card-victory 1.5s ease-in-out infinite; }
+.animate-pulse-ring { animation: pulse-ring 3s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite; }
+.animate-spin-slow { animation: spin-slow 20s linear infinite; }
+
+/* Delay utilities */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-1000 { animation-delay: 1s; }
+
+/* ===== Design System Utility Classes ===== */
+.glass-panel {
+  background: rgba(248, 249, 251, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.shadow-soft-diffuse {
+  box-shadow: 0px 10px 40px rgba(25, 28, 30, 0.04);
+}
+
+.luminous-glow {
+  box-shadow: 0px 0px 40px rgba(0, 67, 235, 0.08);
+}
+
+.gradient-cta {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container));
+  color: #fff;
+}
+
+.cli-command-block {
+  background: var(--color-inverse-surface);
+  color: var(--color-inverse-on-surface);
+}
+
+.ghost-border {
+  border: 1px solid transparent;
+}
+.ghost-border:hover {
+  border-color: var(--color-primary-fixed-dim);
+}
+
+.bg-radial-glow {
+  background:
+    radial-gradient(circle at top right, rgba(0, 67, 235, 0.08), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(107, 56, 212, 0.08), transparent 40%);
+}
+
+/* 3D helpers */
+.card-rotate-3d {
+  transform: perspective(800px) rotateY(-8deg) rotateX(3deg);
+  animation: float-gentle 6s ease-in-out infinite;
+}
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+.perspective-1000 { perspective: 1000px; }
+.scene-3d { perspective: 1200px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c2c6d8; border-radius: 10px; }
+
+/* Selection */
+::selection {
+  background-color: var(--color-primary-fixed);
+  color: var(--color-on-primary-fixed);
+}
+
+body { font-family: var(--font-body); }
+
+/* Respect user preference to reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
