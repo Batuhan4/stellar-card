@@ -45,3 +45,6 @@ next-env.d.ts
 
 # wrangler local state
 .wrangler/
+
+# browser test artifacts
+/e2e/artifacts/

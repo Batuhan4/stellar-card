@@ -255,6 +255,18 @@ npx wrangler pages deploy --project-name stellar-card --branch main
 Edge API surface: `POST /api/card` (issue), `GET /api/card/:id`,
 `POST /api/card/:id/freeze`, `GET /api/cards?email=`.
 
+The UI is responsive (bottom navigation and compact layouts on mobile) and
+carries the project mascot — the 3D crab holding a Lumen Card — animated with CSS
+for idle, anxious, cheer, and peek states. Mascot artwork supplied by the project
+owner.
+
+```bash
+# opt-in browser smoke test (Playwright): all pages at 4 viewports,
+# overflow/console/network checks, reveal interaction; writes screenshots
+npx playwright install chromium
+npm run test:e2e
+```
+
 ## 🧪 Testing
 
 ```bash
@@ -262,10 +274,14 @@ cargo test --workspace   # 66 offline tests: unit, CLI integration, contract
 cargo clippy --workspace --all-targets -- -D warnings
 cargo fmt --all --check
 npm --prefix web run build && npm --prefix web run lint
+npm --prefix web run test:e2e   # opt-in browser smoke test against the live demo
 ```
 
 - Default tests never call Friendbot, Horizon, Soroban RPC, Coinbase, or Stripe —
   every external endpoint is pointed at a local wiremock server.
+- `web/e2e/smoke.mjs` is opt-in: it drives the deployed demo in a real browser
+  (17 checks across 4 pages × 4 viewports plus the card-reveal flow) and is the
+  only test that touches the network by default configuration.
 - The live path is exercised by `scripts/deploy-fee-vault.sh` and
   `scripts/demo-testnet.sh`, whose real outputs are recorded in
   [`docs/uat.md`](docs/uat.md).

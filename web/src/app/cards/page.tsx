@@ -288,7 +288,7 @@ export default function CardRevealPage() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <div className="pt-8 px-8 pb-12 max-w-6xl mx-auto bg-radial-glow min-h-screen">
+      <div className="pt-8 px-4 sm:px-8 pb-12 max-w-6xl mx-auto bg-radial-glow min-h-screen">
         <header className="mb-8 animate-fade-in-up">
           <h1 className="text-4xl font-headline font-bold tracking-tight text-on-surface">Card Issuance</h1>
           <p className="text-on-surface-variant mt-2 max-w-2xl">Deploy high-performance virtual cards instantly. Securely reveal credentials with end-to-end encryption.</p>
@@ -297,7 +297,7 @@ export default function CardRevealPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Card Reveal Stage */}
           <section className="lg:col-span-7 space-y-6">
-            <div className="relative w-full max-w-md mx-auto h-[280px] perspective-1000">
+            <div className="relative w-full max-w-md mx-auto h-[230px] sm:h-[280px] perspective-1000">
               <m.div
                 className="relative w-full h-full preserve-3d cursor-pointer"
                 animate={{ rotateY: revealed ? 180 : 0 }}
@@ -308,9 +308,9 @@ export default function CardRevealPage() {
               >
                 {/* Front */}
                 <div className="absolute inset-0 backface-hidden">
-                  <div className="w-full h-full rounded-xl bg-primary text-on-primary p-6 text-white overflow-hidden shadow-xl">
+                  <div className="w-full h-full rounded-xl bg-primary text-on-primary p-4 sm:p-6 text-white overflow-hidden shadow-xl">
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 pointer-events-none" />
-                    <div className="flex justify-between items-start mb-8">
+                    <div className="flex justify-between items-start mb-4 sm:mb-8">
                       <span className="font-headline text-xl font-bold italic opacity-80">VISA</span>
                       <div className="flex items-center gap-1.5">
                         <span
@@ -331,10 +331,10 @@ export default function CardRevealPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="w-10 h-7 rounded-md bg-amber-300/80 mb-8 flex items-center justify-center">
+                    <div className="w-10 h-7 rounded-md bg-amber-300/80 mb-4 sm:mb-8 flex items-center justify-center">
                       <div className="w-6 h-4 rounded-sm border border-amber-500/40" />
                     </div>
-                    <div className="font-mono text-lg tracking-[0.15em] mb-4 opacity-90">**** **** **** {card.last4}</div>
+                    <div className="font-mono text-base sm:text-lg tracking-[0.15em] mb-4 opacity-90">**** **** **** {card.last4}</div>
                     <div className="flex justify-between items-end">
                       <div><p className="text-[10px] uppercase tracking-widest opacity-60">Card Holder</p><p className="font-headline text-sm font-semibold">{cardDetails.name}</p></div>
                       <div className="text-right"><p className="text-[10px] uppercase tracking-widest opacity-60">Expires</p><p className="font-mono text-sm">{cardDetails.exp}</p></div>
@@ -348,8 +348,8 @@ export default function CardRevealPage() {
                 </div>
                 {/* Back */}
                 <div className="absolute inset-0 backface-hidden" style={{ transform: "rotateY(180deg)" }}>
-                  <div className="w-full h-full rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 p-6 text-white shadow-xl">
-                    <div className="w-full h-10 bg-slate-700 -mx-6 -mt-6 mb-6 px-6" />
+                  <div className="w-full h-full rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 p-4 sm:p-6 text-white shadow-xl">
+                    <div className="w-full h-10 bg-slate-700 -mx-4 -mt-4 mb-4 px-4 sm:-mx-6 sm:-mt-6 sm:mb-6 sm:px-6" />
                     <div className="bg-white/10 rounded-lg p-4 mb-4">
                       <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">Card Number</p>
                       <p className="font-mono text-base tracking-wider">{cardDetails.number}</p>
@@ -358,7 +358,7 @@ export default function CardRevealPage() {
                       <div className="flex-1 bg-white/10 rounded-lg p-3"><p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">Expiry</p><p className="font-mono text-sm">{cardDetails.exp}</p></div>
                       <div className="flex-1 bg-white/10 rounded-lg p-3"><p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">CVC</p><p className="font-mono text-sm">{cardDetails.cvc}</p></div>
                     </div>
-                    <div className="mt-4 flex items-center gap-2 text-[10px] text-slate-500">
+                    <div className="mt-4 hidden sm:flex items-center gap-2 text-[10px] text-slate-500">
                       <Icon name="lock" className="text-xs" /><span>256-bit AES encrypted &middot; PCI-DSS Level 1</span>
                     </div>
                   </div>

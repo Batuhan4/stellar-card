@@ -30,7 +30,7 @@ export default function DepositPage() {
   const [step, setStep] = useState<DepositStep>("select");
   const [asset, setAsset] = useState<"XLM" | "USDC">("XLM");
   const [copied, setCopied] = useState(false);
-  const [, setDeposits] = useLocalStorage<DepositRecord[]>("***REMOVED***-deposits", []);
+  const [, setDeposits] = useLocalStorage<DepositRecord[]>("stellar-card-deposits", []);
 
   const depositAddress = connected ? address : null;
 
@@ -71,7 +71,7 @@ export default function DepositPage() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <div className="pt-8 px-8 pb-12 max-w-5xl mx-auto">
+      <div className="pt-8 px-4 sm:px-8 pb-12 max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-baseline mb-12 gap-6 animate-fade-in-up">
           <div>
@@ -83,23 +83,23 @@ export default function DepositPage() {
               <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
               <span className="text-[10px] uppercase tracking-widest font-bold text-tertiary">Network: Testnet</span>
             </div>
-            <p><span className="text-green-400">$</span> <span className="text-primary">***REMOVED*** deposit address --asset {asset.toLowerCase()}</span></p>
+            <p><span className="text-green-400">$</span> <span className="text-primary">stellar-card deposit address --asset {asset.toLowerCase()}</span></p>
           </div>
         </div>
 
         {/* Progress Steps */}
-        <div className="flex items-center gap-4 mb-12">
+        <div className="flex items-center gap-2 sm:gap-4 mb-12">
           {["Select Asset", "Send Funds", "Confirmed"].map((label, i) => {
             const stepIndex = ["select", "awaiting", "confirmed"].indexOf(step);
             const isComplete = i < stepIndex;
             const isCurrent = i === stepIndex;
             return (
-              <div key={label} className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${isComplete ? "bg-tertiary text-on-tertiary" : isCurrent ? "bg-primary text-on-primary" : "bg-surface-container-highest text-outline"}`}>
+              <div key={label} className="flex items-center gap-2 sm:gap-3">
+                <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-sm font-bold transition-all ${isComplete ? "bg-tertiary text-on-tertiary" : isCurrent ? "bg-primary text-on-primary" : "bg-surface-container-highest text-outline"}`}>
                   {isComplete ? <Icon name="check" className="text-sm" /> : i + 1}
                 </div>
-                <span className={`text-sm font-medium ${isCurrent ? "text-on-surface" : "text-outline"}`}>{label}</span>
-                {i < 2 && <div className={`w-16 h-0.5 ${isComplete ? "bg-tertiary" : "bg-surface-container-highest"}`} />}
+                <span className={`text-xs sm:text-sm font-medium whitespace-nowrap ${isCurrent ? "text-on-surface" : "text-outline"}`}>{label}</span>
+                {i < 2 && <div className={`w-5 sm:w-16 h-0.5 ${isComplete ? "bg-tertiary" : "bg-surface-container-highest"}`} />}
               </div>
             );
           })}
@@ -251,7 +251,7 @@ export default function DepositPage() {
                 {transactions.length > 0 ? `${transactions.length} transaction(s) detected` : "Watching for transactions..."}
               </p>
               <div className="mt-8 bg-inverse-surface text-inverse-on-surface rounded-xl p-5 font-mono text-xs text-left">
-                <p className="text-green-400">$ ***REMOVED*** deposit status --wait</p>
+                <p className="text-green-400">$ stellar-card deposit status --wait</p>
                 <p className="text-primary mt-1">{`{"ok":true,"data":{"status":"${confirmed ? "confirmed" : "pending"}","transactions":${transactions.length}}}`}</p>
               </div>
             </m.div>

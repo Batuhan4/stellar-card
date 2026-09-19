@@ -22,7 +22,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "***REMOVED*** | Virtual Cards for Developers",
+  title: "StellarCard | Virtual Cards for Developers",
   description:
     "Agent-first virtual card infrastructure funded by Stellar. Fund with XLM or USDC, get instant virtual Visa cards.",
 };

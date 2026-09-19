@@ -152,6 +152,19 @@ and every card shown comes from Stripe through the edge API. `npm run build`
 (static export) and `npm run lint` pass; `STRIPE_TEST_KEY` lives only as a
 Pages secret.
 
+## Browser E2E (Playwright, live demo)
+
+`npm --prefix web run test:e2e` drives the deployed demo in headless Chromium:
+
+| Item | Value |
+|---|---|
+| Result (2026-09-20) | **17 checks, 0 failures** across 4 pages × 4 viewports + reveal flow |
+| Viewports | 360×800, 390×844, 768×1024 (touch/mobile), 1440×900 (desktop) |
+| Checks | HTTP 200, no horizontal overflow, no console/page errors, no failed requests |
+| Interaction | `/cards` "Reveal Card Details" → real edge API → real PAN/CVC rendered |
+| Fixes it verified | mobile bottom navigation, stacked page headers, responsive flip card, no desktop hero overflow, mascot rendering |
+| Artifacts | screenshots under `web/e2e/artifacts/` (gitignored) |
+
 ## Repository test coverage (offline)
 `cargo test --workspace` runs 66 tests with no network access:
 

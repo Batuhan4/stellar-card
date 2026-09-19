@@ -12,7 +12,7 @@ interface VirtualCardProps {
 }
 
 export function VirtualCard({
-  name = "***REMOVED*** Agent",
+  name = "StellarCard Agent",
   last4 = "4242",
   exp = "04/29",
   balance = "$250.00",

@@ -1,25 +1,48 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
 import { Icon } from "@/components/Icon";
 import { VirtualCard } from "@/components/VirtualCard";
 import { CrabMascot } from "@/components/CrabMascot";
 import Link from "next/link";
-import { useLocalStorage, useBalance, type DepositRecord, type CardRecord } from "@/hooks/useStellar";
-import { explorerTxUrl } from "@/lib/stellar";
+import { useLocalStorage, useBalance, type DepositRecord } from "@/hooks/useStellar";
+import { explorerTxUrl, isValidEmail, listCards, type CardSummary } from "@/lib/stellar";
 
 export default function DashboardPage() {
   const { balance } = useBalance();
-  const [deposits] = useLocalStorage<DepositRecord[]>("***REMOVED***-deposits", []);
-  const [cards] = useLocalStorage<CardRecord[]>("***REMOVED***-cards", []);
+  const [cardholderName] = useLocalStorage(
+    "stellar-card-holder-name",
+    "StellarCard Demo User"
+  );
+  const [cardholderEmail] = useLocalStorage(
+    "stellar-card-holder-email",
+    "demo@stellar-card.dev"
+  );
+  const [deposits] = useLocalStorage<DepositRecord[]>("stellar-card-deposits", []);
+  const [cards, setCards] = useState<CardSummary[]>([]);
 
-  const activeCards = cards.filter(c => c.status === "active");
+  useEffect(() => {
+    const email = cardholderEmail.trim().toLowerCase();
+    if (!isValidEmail(email)) return;
+    let cancelled = false;
+    listCards(email)
+      .then((list) => {
+        if (!cancelled) setCards(list);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [cardholderEmail]);
+
+  const activeCards = cards.filter((c) => c.status === "active");
   const confirmedDeposits = deposits.filter(d => d.status === "confirmed");
 
   return (
     <LazyMotion features={domAnimation} strict>
       {/* Header */}
-      <header className="flex justify-between items-center mb-12 animate-fade-in-up">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-12 animate-fade-in-up">
         <div>
           <h2 className="text-3xl font-headline font-bold tracking-tight">System Overview</h2>
           <p className="text-outline text-sm">Real-time financial telemetry & card management</p>
@@ -106,17 +129,19 @@ export default function DashboardPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + i * 0.08 }}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="w-12 h-8 shrink-0 rounded-lg bg-primary text-on-primary flex items-center justify-center">
                       <span className="text-white font-mono text-[10px]">{card.last4}</span>
                     </div>
-                    <div>
-                      <p className="font-mono font-medium text-sm">{card.name}</p>
+                    <div className="min-w-0">
+                      <p className="font-mono font-medium text-sm truncate">{cardholderName}</p>
                       <p className="text-[11px] text-outline">**** {card.last4} &middot; Exp {card.exp}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-6">
-                    <span className="font-mono font-bold text-sm">{card.balance}</span>
+                  <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+                    <span className="font-mono font-bold text-sm">
+                      {card.amountUsd != null ? `$${card.amountUsd.toFixed(2)}` : "—"}
+                    </span>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${card.status === "active" ? "bg-tertiary/10 text-tertiary" : "bg-error/10 text-error"}`}>
                       {card.status}
                     </span>
@@ -126,14 +151,26 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <div className="mt-8 flex justify-center">
-            <div className="relative">
-              <VirtualCard name="***REMOVED*** Agent" last4="4242" balance="$250.00" animate3d />
-              <div className="absolute -bottom-6 -right-6">
-                <CrabMascot size="sm" mood="idle" />
+          {cards.length > 0 && (
+            <div className="mt-8 flex justify-center">
+              <div className="relative">
+                <VirtualCard
+                  name={cardholderName}
+                  last4={cards[0].last4}
+                  exp={cards[0].exp}
+                  balance={
+                    cards[0].amountUsd != null
+                      ? `$${cards[0].amountUsd.toFixed(2)}`
+                      : "—"
+                  }
+                  animate3d
+                />
+                <div className="absolute -bottom-6 -right-6">
+                  <CrabMascot size="sm" mood="idle" />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </section>
 
         {/* Recent Deposits */}
@@ -198,7 +235,7 @@ export default function DashboardPage() {
               <Icon name="terminal" className="text-sm" />
               <span className="text-[10px] uppercase tracking-widest">Quick Terminal</span>
             </div>
-            <p className="text-green-400">$ ***REMOVED*** balance</p>
+            <p className="text-green-400">$ stellar-card balance</p>
             <p className="text-primary mt-1">{`{"ok":true,"data":{"balance":"...","currency":"xlm"}}`}</p>
           </div>
         </section>

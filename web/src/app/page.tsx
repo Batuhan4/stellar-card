@@ -2,6 +2,7 @@
 
 import { LazyMotion, domAnimation } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
+import { MobileBottomNav } from "@/components/MobileNav";
 import { CrabMascot } from "@/components/CrabMascot";
 import { Icon } from "@/components/Icon";
 import Link from "next/link";
@@ -12,7 +13,7 @@ export default function LandingPage() {
       <Navbar />
       <main className="pt-24">
         {/* Hero */}
-        <section className="relative min-h-[900px] flex items-center px-8 max-w-7xl mx-auto">
+        <section className="relative min-h-[720px] lg:min-h-[900px] flex items-center px-4 sm:px-8 max-w-7xl mx-auto overflow-hidden">
           <div className="absolute -top-24 -left-24 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
           <div className="absolute top-1/2 -right-24 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px]" />
 
@@ -50,9 +51,9 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Visual — Stitch 3D hero with crab */}
-            <div className="relative h-[600px] flex items-center justify-center scene-3d">
-              <div className="animate-float-3d relative">
-                <div className="absolute -top-12 left-0 animate-crab-reveal z-0">
+            <div className="relative h-[420px] sm:h-[600px] flex items-center justify-center scene-3d">
+              <div className="animate-float-3d relative scale-[0.68] sm:scale-100">
+                <div className="absolute -top-16 -left-6 z-30">
                   <CrabMascot size="lg" mood="idle" />
                 </div>
 
@@ -62,7 +63,7 @@ export default function LandingPage() {
                     <div className="h-full flex flex-col justify-between relative z-10">
                       <div className="flex justify-between items-start">
                         <div className="w-12 h-10 bg-gradient-to-r from-amber-400 to-amber-200/50 rounded-lg opacity-80" />
-                        <div className="text-white/40 font-mono tracking-widest text-xs uppercase">***REMOVED*** Global</div>
+                        <div className="text-white/40 font-mono tracking-widest text-xs uppercase">StellarCard Global</div>
                       </div>
                       <div className="space-y-4">
                         <div className="text-2xl text-white font-mono tracking-[0.3em]">4242 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 1085</div>
@@ -129,9 +130,9 @@ export default function LandingPage() {
 
             <div className="relative grid md:grid-cols-3 gap-12">
               {[
-                { icon: "terminal", title: "1. Generate address", desc: "Request a unique deposit address via CLI or wallet. Instant generation on the Stellar network.", code: "***REMOVED*** deposit address --asset xlm" },
-                { icon: "currency_bitcoin", title: "2. Send XLM / USDC", desc: "Transfer assets to your assigned address. We detect the transaction within seconds via Horizon.", code: "***REMOVED*** card buy --amount 50" },
-                { icon: "credit_card", title: "3. Receive card", desc: "A virtual Visa/Mastercard is issued instantly. Full card details returned in your terminal.", code: "***REMOVED*** card show crd_abc" },
+                { icon: "terminal", title: "1. Generate address", desc: "Request a unique deposit address via CLI or wallet. Instant generation on the Stellar network.", code: "stellar-card deposit address --asset xlm" },
+                { icon: "currency_bitcoin", title: "2. Send XLM / USDC", desc: "Transfer assets to your assigned address. We detect the transaction within seconds via Horizon.", code: "stellar-card card buy --amount 50" },
+                { icon: "credit_card", title: "3. Receive card", desc: "A virtual Visa/Mastercard is issued instantly. Full card details returned in your terminal.", code: "stellar-card card show crd_abc" },
               ].map((item, i) => (
                 <div
                   key={item.title}
@@ -181,7 +182,7 @@ export default function LandingPage() {
               </div>
               <pre className="text-primary-fixed-dim overflow-x-auto leading-relaxed"><code>{`# AI Agent: autonomous card purchase
 result = subprocess.run(
-  ["***REMOVED***", "card", "buy",
+  ["stellar-card", "card", "buy",
    "--amount", "50",
    "--format", "json"],
   capture_output=True
@@ -268,7 +269,7 @@ else:
         <footer className="py-16 px-8 bg-inverse-surface text-inverse-on-surface">
           <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
             <div>
-              <h3 className="font-headline font-bold text-lg mb-4">***REMOVED***</h3>
+              <h3 className="font-headline font-bold text-lg mb-4">StellarCard</h3>
               <p className="text-sm text-slate-400 leading-relaxed">Agent-first virtual card infrastructure funded by Stellar.</p>
             </div>
             {[
@@ -279,9 +280,9 @@ else:
                 { label: "Deposit", href: "/deposit" },
               ]},
               { title: "Resources", links: [
-                { label: "GitHub", href: "https://github.com" },
+                { label: "Live Demo", href: "https://card.batuhan4.com" },
+                { label: "GitHub", href: "https://github.com/Batuhan4/stellar-card" },
                 { label: "Stellar Expert", href: "https://stellar.expert/explorer/testnet" },
-                { label: "Security", href: "#security" },
                 { label: "Cards", href: "/cards" },
               ]},
               { title: "Legal", links: [
@@ -301,9 +302,10 @@ else:
             ))}
           </div>
           <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/10 text-center text-sm text-slate-500">
-            &copy; 2026 ***REMOVED***. All rights reserved.
+            &copy; 2026 StellarCard. All rights reserved.
           </div>
         </footer>
+        <MobileBottomNav />
       </main>
     </LazyMotion>
   );

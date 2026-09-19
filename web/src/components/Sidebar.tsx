@@ -23,10 +23,10 @@ export function Sidebar() {
       <div className="mb-10 px-2">
         <Link href="/">
           <h1 className="font-headline text-lg font-black tracking-tighter text-slate-900">
-            ***REMOVED***
+            StellarCard
           </h1>
         </Link>
-        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Terminal Edition</p>
+        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Stellar Testnet</p>
       </div>
       <nav className="flex flex-col gap-1 flex-1">
         {navItems.map((item) => {
