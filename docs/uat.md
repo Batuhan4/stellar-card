@@ -135,11 +135,12 @@ Horizon before issuing a real Stripe test-mode card. Verified live on 2026-09-20
 
 | Item | Value |
 |---|---|
-| Production URL | `https://stellar-card-54s.pages.dev` (custom domain `card.batuhan4.com` attaching) |
+| Production URL | `https://card.batuhan4.com` (Cloudflare Pages custom domain, SSL valid) |
 | Deployments | `f530b807` (first), `8616a559` (after `STRIPE_TEST_KEY` secret) |
 | KV namespace | `STELLAR_CARD_KV` = `55926b9b6752448ea08f05d30bf44253` |
 | Local run | fee tx `fe9a19fe51a91338425dfe97b93e1242915083eb90f665b0ca313b37a265e163` → Stripe card `ic_1UHdX0EAzMrENaFXlepCYbLj`, last4 `0187` |
-| Production run | fee tx `8b822a2172a2b6004cd64274a0e8bb7d81f89b0ea4ffc429367395d507190238` → Stripe card `ic_1UHdbSEAzMrENaFXBEQU1yq4`, last4 `0203` |
+| `pages.dev` run | fee tx `8b822a2172a2b6004cd64274a0e8bb7d81f89b0ea4ffc429367395d507190238` → Stripe card `ic_1UHdbSEAzMrENaFXBEQU1yq4`, last4 `0203` |
+| Custom-domain run | fee tx `7916e861609a6d6e29eae5d625b720553aa89336ca0b20aec07b75b98aac622f` → Stripe card `ic_1UHdlVEAzMrENaFXLdoGZURr`, last4 `0229` |
 | PAN/CVC expand | returned (`4000…` test PAN, `cvc` present, `livemode: false`) |
 | Replay guard | same fee tx again → HTTP `409` |
 | Wrong-email read | `GET /api/card/:id` with another email → HTTP `403` |

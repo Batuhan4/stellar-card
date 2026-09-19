@@ -55,7 +55,7 @@ agent or a developer script can run the whole flow without touching a UI.
 | 💸 Live fee collection #1 | [`ffedc71a…`](https://stellar.expert/explorer/testnet/tx/ffedc71a2219c3f79b576fea831982fb7a0feab4dffdcad0fd544c1764bd4a23) |
 | 💸 Live fee collection #2 | [`8f841537…`](https://stellar.expert/explorer/testnet/tx/8f841537d4215ccb084b8f49a32df31d33e9f55dd34c9df14ae82a5f85bda66c) |
 | 🌐 Live web demo | [`card.batuhan4.com`](https://card.batuhan4.com) (fallback [`stellar-card-54s.pages.dev`](https://stellar-card-54s.pages.dev)) |
-| 🪪 Edge-issued test card | `ic_1UHdbSEAzMrENaFXBEQU1yq4` (last4 `0203`) via on-chain fee [`8b822a21…`](https://stellar.expert/explorer/testnet/tx/8b822a2172a2b6004cd64274a0e8bb7d81f89b0ea4ffc429367395d507190238) |
+| 🪪 Edge-issued test cards | `ic_1UHdbSE…` last4 `0203` via fee [`8b822a21…`](https://stellar.expert/explorer/testnet/tx/8b822a2172a2b6004cd64274a0e8bb7d81f89b0ea4ffc429367395d507190238) · `ic_1UHdlVE…` last4 `0229` via fee [`7916e861…`](https://stellar.expert/explorer/testnet/tx/7916e861609a6d6e29eae5d625b720553aa89336ca0b20aec07b75b98aac622f) |
 
 The second live run issued a Visa card (`last4 0161`), revealed its test-mode
 PAN/CVC, then froze it — all through the CLI. Full evidence, hashes, and the
