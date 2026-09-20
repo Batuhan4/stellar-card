@@ -50,7 +50,7 @@ export function Sidebar() {
       <div className="mt-auto pt-6 px-2 space-y-3">
         {/* Network indicator */}
         <div className="flex items-center gap-2 px-1">
-          <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-tertiary opacity-60" />
           <span className="text-[10px] uppercase tracking-widest font-bold text-tertiary">Testnet</span>
         </div>
         <WalletInfo />

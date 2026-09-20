@@ -16,14 +16,14 @@ export function Navbar() {
           >
             StellarCard
           </Link>
-          <div className="hidden md:flex gap-6">
-            <a href="#how-it-works" className="text-slate-600 hover:text-primary transition-colors font-body text-base font-medium">
-              Documentation
+          <div className="hidden md:flex gap-2">
+            <a href="#how-it-works" className="text-slate-600 hover:text-primary hover:bg-primary/10 px-4 py-2 rounded-lg transition-all duration-200 font-body text-base font-medium">
+              How it Works
             </a>
-            <a href="#security" className="text-slate-600 hover:text-primary transition-colors font-body text-base font-medium">
+            <a href="#security" className="text-slate-600 hover:text-primary hover:bg-primary/10 px-4 py-2 rounded-lg transition-all duration-200 font-body text-base font-medium">
               Security
             </a>
-            <a href="#pricing" className="text-slate-600 hover:text-primary transition-colors font-body text-base font-medium">
+            <a href="#pricing" className="text-slate-600 hover:text-primary hover:bg-primary/10 px-4 py-2 rounded-lg transition-all duration-200 font-body text-base font-medium">
               Pricing
             </a>
           </div>

@@ -17,27 +17,30 @@ export default function LandingPage() {
       <Navbar />
       <main className="pt-24">
         {/* Hero */}
-        <section className="relative min-h-[720px] lg:min-h-[900px] flex items-center px-4 sm:px-8 max-w-7xl mx-auto overflow-hidden">
-          <div className="absolute -top-24 -left-24 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
-          <div className="absolute top-1/2 -right-24 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px]" />
+        <section className="relative min-h-[800px] xl:min-h-[900px] flex items-center px-6 sm:px-8 xl:px-16 overflow-hidden">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-32 -left-32 w-[700px] h-[700px] bg-primary/8 rounded-full blur-[140px]" />
+            <div className="absolute top-1/3 -right-32 w-[500px] h-[500px] bg-secondary/6 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-tertiary/5 rounded-full blur-[100px]" />
+          </div>
 
-          <div className="grid min-w-0 lg:grid-cols-2 gap-10 sm:gap-16 items-center w-full relative z-10">
+          <div className="grid min-w-0 lg:grid-cols-2 gap-12 xl:gap-20 items-center w-full max-w-[1600px] mx-auto relative z-10">
             <div className="space-y-6 sm:space-y-8 animate-fade-in-up min-w-0">
-              <div className="inline-flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-full">
+              <div className="inline-flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-full transition-all duration-300">
                 <span className="w-2 h-2 rounded-full bg-tertiary-container animate-pulse" />
                 <span className="text-[0.65rem] font-headline font-bold uppercase tracking-[0.2em] text-on-surface-variant">
                   Stellar Testnet Live
                 </span>
               </div>
 
-              <h1 className="text-4xl sm:text-6xl md:text-7xl font-headline font-bold leading-[0.9] tracking-tight text-on-surface">
+              <h1 className="text-5xl sm:text-6xl xl:text-7xl 2xl:text-8xl font-headline font-bold leading-[0.9] tracking-tight text-on-surface">
                 Virtual cards for{" "}
-                <span className="text-primary">agents</span> and developers
+                <span className="text-primary">humans</span> and developers
               </h1>
 
-              <p className="text-base sm:text-xl text-on-surface-variant max-w-md leading-relaxed">
-                Fund with Stellar. Spend anywhere. The first CLI-native
-                infrastructure for instant global liquidity.
+              <p className="text-base sm:text-xl xl:text-2xl text-on-surface-variant max-w-lg leading-relaxed">
+                Buy a card in three taps. No crypto wallet needed — Stellar settles
+                the payment under the hood.
               </p>
 
               <div className="flex flex-wrap gap-3 pt-4">
@@ -47,7 +50,7 @@ export default function LandingPage() {
                 >
                   <Icon name="bolt" className="text-[18px]" filled />
                   Quick Buy with TRY
-                  <span className="text-[10px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold uppercase tracking-widest bg-amber-400/90 text-amber-900 px-2 py-0.5 rounded-full">
                     demo
                   </span>
                 </Link>
@@ -93,14 +96,14 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Visual — Stitch 3D hero with crab */}
-            <div className="relative h-[320px] sm:h-[600px] w-full flex items-center justify-center scene-3d">
-              <div className="animate-float-3d relative w-[300px] h-[200px] sm:w-[440px] sm:h-[280px]">
-                <div className="absolute -top-10 -left-4 sm:-top-16 sm:-left-6 z-30 origin-top-left scale-75 sm:scale-100">
+            <div className="relative h-[400px] sm:h-[600px] xl:h-[700px] 2xl:h-[800px] w-full flex items-center justify-center scene-3d">
+              <div className="animate-float-3d relative w-[320px] h-[200px] sm:w-[440px] sm:h-[280px] xl:w-[520px] xl:h-[340px]">
+                <div className="absolute -top-12 -left-4 sm:-top-16 sm:-left-6 z-30 origin-top-left scale-75 sm:scale-90 xl:scale-100">
                   <CrabMascot size="lg" mood="idle" />
                 </div>
 
-                <div className="animate-card-rotation absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 origin-center scale-[0.66] sm:scale-100">
-                  <div className="w-[440px] h-[280px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2rem] p-8 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden border border-white/10">
+                <div className="animate-card-rotation absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 origin-center scale-[0.6] sm:scale-[0.8] xl:scale-100">
+                  <div className="w-[440px] h-[280px] xl:w-[520px] xl:h-[340px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2rem] xl:rounded-[2.5rem] p-8 xl:p-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden border border-white/10">
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl" />
                     <div className="h-full flex flex-col justify-between relative z-10">
                       <div className="flex justify-between items-start">
@@ -108,7 +111,7 @@ export default function LandingPage() {
                         <div className="text-white/40 font-mono tracking-widest text-xs uppercase">StellarCard Global</div>
                       </div>
                       <div className="space-y-4">
-                        <div className="text-2xl text-white font-mono tracking-[0.3em]">4242 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 1085</div>
+                        <div className="text-2xl xl:text-3xl text-white font-mono tracking-[0.3em]">4242 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 1085</div>
                         <div className="flex justify-between items-end">
                           <div className="space-y-1">
                             <div className="text-[10px] text-white/40 uppercase tracking-widest">Card Holder</div>
@@ -127,7 +130,7 @@ export default function LandingPage() {
                 <div className="absolute top-1/2 left-1/2 w-[30px] h-[20px] bg-gradient-to-br from-primary to-secondary rounded-sm pointer-events-none animate-boomerang z-50" />
               </div>
 
-              <div className="hidden sm:block absolute -top-12 -left-20 glass-panel p-5 rounded-2xl shadow-soft-diffuse border border-white/50 w-64 z-30 animate-fade-in-up delay-500">
+              <div className="hidden sm:block absolute -top-12 -left-16 xl:-left-24 glass-panel p-5 rounded-2xl shadow-soft-diffuse border border-white/50 w-64 xl:w-72 z-30 animate-fade-in-up delay-500">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center">
                     <Icon name="account_balance_wallet" className="text-on-tertiary-fixed text-[18px]" filled />
@@ -140,7 +143,7 @@ export default function LandingPage() {
                 <div className="text-[11px] text-on-surface-variant font-mono">+ 42.50 XLM confirmed</div>
               </div>
 
-              <div className="hidden sm:block absolute -bottom-8 -right-16 glass-panel p-5 rounded-2xl shadow-soft-diffuse border border-white/50 w-60 z-30 animate-fade-in-up delay-700">
+              <div className="hidden sm:block absolute -bottom-8 -right-16 xl:-right-24 glass-panel p-5 rounded-2xl shadow-soft-diffuse border border-white/50 w-60 xl:w-68 z-30 animate-fade-in-up delay-700">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center">
                     <Icon name="verified" className="text-primary text-[18px]" />
@@ -157,38 +160,35 @@ export default function LandingPage() {
         </section>
 
         {/* How it Works */}
-        <section id="how-it-works" className="py-20 bg-surface-container-low relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-8 relative z-10">
+        <section id="how-it-works" className="py-20 xl:py-28 bg-surface-container-low relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-8 xl:px-16 relative z-10">
             <div className="flex flex-col items-center text-center mb-16 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-headline font-bold text-on-surface mb-6 tracking-tight">
-                Streamlined for Speed
+              <h2 className="text-4xl md:text-5xl xl:text-6xl font-headline font-bold text-on-surface mb-6 tracking-tight">
+                How it works
               </h2>
-              <p className="text-on-surface-variant max-w-xl text-lg">
-                A straight line from crypto to consumer spending. No KYC hurdles for testnets, instant issuance on mainnet.
+              <p className="text-on-surface-variant max-w-xl xl:text-xl text-lg">
+                Three steps between you and a virtual card. No crypto knowledge needed — Stellar handles the complex part.
               </p>
             </div>
 
             <div className="hidden md:block absolute top-1/2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary-fixed-dim to-transparent -translate-y-1/2 z-0" />
 
-            <div className="relative grid md:grid-cols-3 gap-12">
+            <div className="relative grid md:grid-cols-3 gap-8 xl:gap-12">
               {[
-                { icon: "terminal", title: "1. Generate address", desc: "Request a unique deposit address via CLI or wallet. Instant generation on the Stellar network.", code: "stellar-card deposit address --asset xlm" },
-                { icon: "currency_bitcoin", title: "2. Send XLM / USDC", desc: "Transfer assets to your assigned address. We detect the transaction within seconds via Horizon.", code: "stellar-card card buy --amount 50" },
-                { icon: "credit_card", title: "3. Receive card", desc: "A virtual Visa/Mastercard is issued instantly. Full card details returned in your terminal.", code: "stellar-card card show crd_abc" },
+                { icon: "send", title: "1. Send money", desc: "Transfer TRY to the IBAN we give you. Reference code ensures it's tracked automatically." },
+                { icon: "autorenew", title: "2. We convert & fund", desc: "Your TRY is converted to USDC on Stellar and deposited into your card account on-chain." },
+                { icon: "credit_card", title: "3. Card is issued", desc: "A virtual Visa is created instantly. Use the card number anywhere that accepts Visa — it's a real test-mode card." },
               ].map((item, i) => (
                 <div
                   key={item.title}
                   className={`relative z-10 group animate-fade-in-up delay-${(i + 1) * 200}`}
                 >
-                  <div className="bg-surface-container-lowest p-10 rounded-[2.5rem] shadow-soft-diffuse hover:shadow-lg transition-all border border-transparent hover:border-primary-fixed-dim">
-                    <div className="w-16 h-16 bg-surface-container-low rounded-2xl flex items-center justify-center mb-8 text-primary group-hover:scale-110 transition-transform">
-                      <Icon name={item.icon} className="text-3xl" filled />
+                  <div className="bg-surface-container-lowest p-8 xl:p-10 rounded-[2rem] shadow-soft-diffuse hover:shadow-xl transition-all duration-300 border border-transparent hover:border-primary-fixed-dim">
+                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
+                      <Icon name={item.icon} className="text-2xl" filled />
                     </div>
-                    <h3 className="text-2xl font-headline font-bold mb-4">{item.title}</h3>
-                    <p className="text-on-surface-variant leading-relaxed mb-6">{item.desc}</p>
-                    <div className="bg-inverse-surface text-inverse-on-surface font-mono text-xs rounded-lg p-3 break-all">
-                      <span className="text-green-400">$ </span><span className="text-primary-fixed-dim">{item.code}</span>
-                    </div>
+                    <h3 className="text-xl xl:text-2xl font-headline font-bold mb-3">{item.title}</h3>
+                    <p className="text-on-surface-variant leading-relaxed text-sm xl:text-base">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -197,57 +197,67 @@ export default function LandingPage() {
         </section>
 
         {/* Agent Pitch */}
-        <section id="security" className="py-20 px-8 max-w-7xl mx-auto">
-          <div className="grid min-w-0 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+        <section id="security" className="py-20 xl:py-28 px-8 xl:px-16 max-w-[1600px] mx-auto">
+          <div className="grid min-w-0 lg:grid-cols-2 gap-10 xl:gap-20 items-center">
             <div className="animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-headline font-bold text-on-surface mb-8 tracking-tight">
-                Built for the <br /><span className="text-secondary">Agentic Future</span>
+              <h2 className="text-4xl md:text-5xl xl:text-6xl font-headline font-bold text-on-surface mb-8 tracking-tight">
+                Built for the <br /><span className="text-secondary">Real World</span>
               </h2>
-              <div className="space-y-6">
-                {["Headless Operations — Perfect for AI agents that need to pay autonomously", "Structured JSON Output — Every response machine-parseable", "Idempotent Operations — Safe to retry on network failures", "Zero Interactive Prompts — No human required in the loop", "Deterministic Exit Codes — Scriptable in any CI/CD pipeline"].map((feat) => (
+              <div className="space-y-5">
+                {["Works without a crypto wallet — just an IBAN transfer", "Real virtual Visa card, usable at any merchant", "Instant issuance — card ready in seconds", "Transparent $0.10 + 0.20% fee, visible on-chain", "Freeze or unfreeze the card anytime, instantly"].map((feat) => (
                   <div key={feat} className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-secondary-fixed flex items-center justify-center mt-1 shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-secondary-fixed flex items-center justify-center mt-0.5 shrink-0">
                       <Icon name="check" className="text-secondary text-[14px]" filled />
                     </div>
-                    <p className="text-on-surface-variant text-sm">{feat}</p>
+                    <p className="text-on-surface-variant text-sm xl:text-base leading-relaxed">{feat}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="min-w-0 overflow-hidden bg-inverse-surface rounded-2xl p-4 sm:p-6 font-mono text-xs sm:text-sm shadow-soft-diffuse animate-fade-in-up delay-200">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="w-3 h-3 rounded-full bg-error/60" />
-                <span className="w-3 h-3 rounded-full bg-amber-400/60" />
-                <span className="w-3 h-3 rounded-full bg-green-400/60" />
-                <span className="text-slate-500 text-xs ml-2">agent_workflow.py</span>
+            <div className="min-w-0 overflow-hidden bg-white rounded-2xl p-6 xl:p-8 shadow-soft-diffuse border border-outline-variant animate-fade-in-up delay-200">
+              <div className="flex items-center gap-2 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Icon name="credit_card" className="text-primary text-xl" filled />
+                </div>
+                <div>
+                  <div className="font-headline font-bold text-sm text-on-surface">StellarCard</div>
+                  <div className="text-[10px] text-outline">Virtual Card Issuance</div>
+                </div>
               </div>
-              <pre className="text-primary-fixed-dim overflow-x-auto whitespace-pre-wrap break-words leading-relaxed"><code>{`# AI Agent: autonomous card purchase
-result = subprocess.run(
-  ["stellar-card", "card", "buy",
-   "--amount", "50",
-   "--format", "json"],
-  capture_output=True
-)
-
-data = json.loads(result.stdout)
-if data["ok"]:
-    card = data["data"]
-    print(f"Card ready: {card['last4']}")
-else:
-    error = data["error"]
-    print(f"Fix: {error['suggestion']}")`}</code></pre>
+              <div className="space-y-2 font-mono text-xs text-on-surface-variant mb-5">
+                <div className="flex justify-between"><span>Card amount</span><span className="font-bold">$50.00 USD</span></div>
+                <div className="flex justify-between"><span>Fixed fee</span><span>$0.10</span></div>
+                <div className="flex justify-between"><span>Variable fee (20 bps)</span><span>$0.10</span></div>
+                <div className="border-t border-outline-variant/30 pt-2 mt-2 flex justify-between font-bold text-sm">
+                  <span>Total</span><span className="text-primary">$0.20</span>
+                </div>
+              </div>
+              <div className="rounded-lg bg-surface-container-low p-3 space-y-1">
+                <div className="flex items-center gap-2 text-[10px] text-on-surface-variant">
+                  <Icon name="check_circle" className="text-tertiary text-sm" filled />
+                  <span>Card ending <span className="font-mono font-bold">4242</span> issued</span>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] text-on-surface-variant">
+                  <Icon name="check_circle" className="text-tertiary text-sm" filled />
+                  <span>Fee collected on-chain (Soroban)</span>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] text-on-surface-variant">
+                  <Icon name="check_circle" className="text-tertiary text-sm" filled />
+                  <span>Available for immediate use</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Features Grid */}
-        <section className="py-20 px-8 bg-surface-container-low">
+        <section className="py-20 xl:py-28 px-8 xl:px-16 bg-surface-container-low">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-5xl font-headline font-bold tracking-tight text-center mb-16 animate-fade-in-up">
-              Streamlined for speed
+            <h2 className="text-5xl xl:text-6xl font-headline font-bold tracking-tight text-center mb-16 animate-fade-in-up">
+              Everything you need
             </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
               {[
                 { icon: "bolt", title: "Instant Issuance", desc: "Cards are active immediately upon creation. No waiting period." },
                 { icon: "lock", title: "PCI Compliant", desc: "Card data never touches our servers. Stripe handles all sensitive data." },
@@ -258,13 +268,13 @@ else:
               ].map((item, i) => (
                 <div
                   key={item.title}
-                  className={`bg-surface-container-lowest rounded-2xl p-6 shadow-soft-diffuse hover:shadow-lg transition-all group animate-fade-in-up delay-${(i % 3 + 1) * 100}`}
+                  className={`bg-surface-container-lowest rounded-2xl p-6 xl:p-8 shadow-soft-diffuse hover:shadow-xl transition-all duration-300 group animate-fade-in-up delay-${(i % 3 + 1) * 100}`}
                 >
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors duration-300">
                     <Icon name={item.icon} className="text-primary" />
                   </div>
-                  <h3 className="font-headline font-bold mb-2">{item.title}</h3>
-                  <p className="text-on-surface-variant text-sm leading-relaxed">{item.desc}</p>
+                  <h3 className="font-headline font-bold mb-2 xl:text-lg">{item.title}</h3>
+                  <p className="text-on-surface-variant text-sm xl:text-base leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -272,13 +282,13 @@ else:
         </section>
 
         {/* Pricing — REAL fees from CLI: $0.10 fixed + 0.20% variable */}
-        <section id="pricing" className="py-20 px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-5xl font-headline font-bold tracking-tight mb-4 animate-fade-in-up">
+        <section id="pricing" className="py-20 xl:py-28 px-8 xl:px-16">
+          <div className="max-w-5xl mx-auto text-center">
+            <h2 className="text-5xl xl:text-6xl font-headline font-bold tracking-tight mb-4 animate-fade-in-up">
               Simple, transparent pricing
             </h2>
-            <p className="text-on-surface-variant text-lg mb-16">No monthly fees. Pay only for what you use.</p>
-            <div className="bg-surface-container-lowest rounded-2xl p-10 shadow-soft-diffuse max-w-lg mx-auto animate-fade-in-up delay-200">
+            <p className="text-on-surface-variant text-lg xl:text-xl mb-16">No monthly fees. Pay only for what you use.</p>
+            <div className="bg-surface-container-lowest rounded-2xl p-10 xl:p-14 shadow-soft-diffuse max-w-2xl mx-auto animate-fade-in-up delay-200">
               <div className="flex items-baseline justify-center gap-3 mb-2">
                 <span className="text-5xl font-headline font-bold text-primary">$0.10</span>
                 <span className="text-2xl font-headline font-bold text-on-surface-variant">+ 0.20%</span>
@@ -308,8 +318,8 @@ else:
         </section>
 
         {/* Footer */}
-        <footer className="py-16 px-8 bg-inverse-surface text-inverse-on-surface">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
+        <footer className="py-16 px-8 xl:px-16 bg-inverse-surface text-inverse-on-surface">
+          <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 xl:gap-16">
             <div>
               <h3 className="font-headline font-bold text-lg mb-4">StellarCard</h3>
               <p className="text-sm text-slate-400 leading-relaxed">Agent-first virtual card infrastructure funded by Stellar.</p>
@@ -343,7 +353,7 @@ else:
               </div>
             ))}
           </div>
-          <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/10 text-center text-sm text-slate-500">
+          <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/10 text-center text-sm text-slate-400">
             &copy; 2026 StellarCard. All rights reserved.
           </div>
         </footer>

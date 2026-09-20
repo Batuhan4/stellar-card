@@ -84,7 +84,7 @@ export default function QuickBuyPage() {
   };
 
   return (
-    <div className="pt-8 px-4 sm:px-8 pb-12 max-w-3xl mx-auto">
+    <div className="pt-20 md:pt-8 px-4 sm:px-8 pb-12 max-w-3xl mx-auto">
       <header className="mb-8 animate-fade-in-up">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-3xl sm:text-4xl font-headline font-bold tracking-tight text-on-surface">
@@ -98,7 +98,7 @@ export default function QuickBuyPage() {
           Buy a virtual card in three taps: send TRY to the IBAN, and the card is
           issued. No wallet, no Stellar knowledge required.
         </p>
-        <div className="mt-4 flex items-start gap-2 rounded-xl bg-surface-container p-4 text-xs text-on-surface-variant">
+        <div className="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs text-amber-800">
           <Icon name="info" className="text-sm mt-0.5 shrink-0" />
           <span>
             Demo preview: no live TRY-capable Stellar anchor exists yet, so the
@@ -116,11 +116,11 @@ export default function QuickBuyPage() {
       )}
 
       {step === "amount" && (
-        <section className="bg-surface-container-lowest rounded-2xl p-6 shadow-soft-diffuse animate-fade-in-up">
-          <p className="text-[10px] uppercase tracking-widest text-outline font-bold mb-3">
+        <section className="bg-surface-container-lowest rounded-2xl p-6 sm:p-8 shadow-soft-diffuse animate-fade-in-up">
+          <p className="text-[10px] uppercase tracking-widest text-outline font-bold mb-4">
             Step 1 — Choose the card amount
           </p>
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-2 gap-3 mb-8">
             {PRESETS.map((option) => (
               <button
                 key={option.usd}

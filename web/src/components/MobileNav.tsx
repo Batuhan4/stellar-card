@@ -47,7 +47,7 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 py-3 text-[9px] font-medium transition-colors ${
+              className={`flex flex-col items-center gap-1 py-3 text-[10px] font-medium transition-colors ${
                 active ? "text-primary" : "text-slate-500"
               }`}
             >
