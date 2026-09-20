@@ -68,8 +68,8 @@ Optional: install this skill for Codex (default `~/.codex/skills`) and optionall
 Claude Code:
 
 ```bash
-./scripts/***REMOVED***
-./scripts/***REMOVED*** --claude
+./scripts/install-skill.sh
+./scripts/install-skill.sh --claude
 ```
 
 ## Step 2 — Authenticate

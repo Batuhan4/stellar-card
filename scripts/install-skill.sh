@@ -3,9 +3,9 @@
 # Install the stellar-card-agent skill for Codex (and optionally Claude Code).
 #
 # Usage:
-#   ./scripts/***REMOVED***            # install into $CODEX_HOME/skills
-#   ./scripts/***REMOVED*** --claude   # also install into ~/.claude/skills
-#   ./scripts/***REMOVED*** --all      # same as --claude
+#   ./scripts/install-skill.sh            # install into $CODEX_HOME/skills
+#   ./scripts/install-skill.sh --claude   # also install into ~/.claude/skills
+#   ./scripts/install-skill.sh --all      # same as --claude
 #
 set -euo pipefail
 
@@ -22,7 +22,7 @@ usage() {
 Install the stellar-card-agent skill.
 
 Usage:
-  ***REMOVED*** [--claude|--all]
+  install-skill.sh [--claude|--all]
 
 Options:
   --claude, --all   Also install for Claude Code into ~/.claude/skills

@@ -1,6 +1,6 @@
-# ***REMOVED*** Web
+# StellarCard Web
 
-Next.js web surface for *****REMOVED*****, an agent-first virtual-card CLI funded on Stellar testnet. The app connects to Freighter, reads live testnet balances and deposits from Horizon, and collects card fees on-chain through the Soroban fee-vault contract.
+Next.js web surface for **StellarCard**, an agent-first virtual-card CLI funded on Stellar testnet. The app connects to Freighter, reads live testnet balances and deposits from Horizon, and collects card fees on-chain through the Soroban fee-vault contract.
 
 ## Requirements
 

@@ -318,10 +318,6 @@ Built for the Stellar Pro Hackathon 2026, Genesis Track.
     the community skills installer that distributes the module above; no code
     was vendored from it.
   - The repo's own `.agents/skills/stellar-card-agent` skill is original (MIT).
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
 
 ## 📁 Project layout
 

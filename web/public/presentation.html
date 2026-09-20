@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>***REMOVED*** — Hackathon Pitch</title>
+<title>StellarCard — Hackathon Pitch</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet">
 <style>
@@ -541,18 +541,18 @@
     <div class="flow" style="margin-top:2.5rem;">
       <div class="flow-step">XLM on Testnet</div>
       <div class="flow-arrow">&rarr;</div>
-      <div class="flow-step">***REMOVED***</div>
+      <div class="flow-step">StellarCard</div>
       <div class="flow-arrow">&rarr;</div>
       <div class="flow-step">Virtual Visa</div>
       <div class="flow-arrow">&rarr;</div>
       <div class="flow-step">Spend Anywhere</div>
     </div>
     <div style="margin-top:2.5rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-      <a href="https://github.com/Batuhan4/***REMOVED***" class="cta-btn">
+      <a href="https://github.com/Batuhan4/stellar-card" class="cta-btn">
         <span class="icon" style="font-size:18px;">arrow_forward</span> Get Started
       </a>
       <div class="cta-btn-secondary" style="cursor:default;">
-        <code style="font-family:var(--font-mono);font-size:0.9rem;">npm install -g ***REMOVED***</code>
+        <code style="font-family:var(--font-mono);font-size:0.9rem;">cargo build --release</code>
       </div>
     </div>
   </div>
@@ -581,7 +581,7 @@
       </div>
       <div class="stat">
         <div class="stat-number text-tertiary">0%</div>
-        <div class="stat-label">With ***REMOVED*** — spend directly</div>
+        <div class="stat-label">With StellarCard — spend directly</div>
       </div>
       <div class="stat">
         <div class="stat-number text-primary">1 cmd</div>
@@ -598,7 +598,7 @@
     <div class="tag tag--tertiary"><span class="icon" style="font-size:14px;">credit_card</span> The Solution</div>
     <h2>Skip the exchange. <span class="text-primary">Spend your crypto directly.</span></h2>
     <p style="max-width:640px;">
-      ***REMOVED*** converts your XLM deposits into virtual Visa cards — instantly, from the terminal.
+      StellarCard converts your XLM deposits into virtual Visa cards — instantly, from the terminal.
       No exchange account. No fiat off-ramp. No taxable conversion event. Deposit and spend.
     </p>
     <div class="terminal" style="margin-top:2rem;max-width:640px;">
@@ -608,13 +608,13 @@
         <span class="dot-green"></span>
       </div>
       <span class="term-comment"># deposit XLM</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">***REMOVED***</span> deposit address <span class="term-flag">--asset</span> <span class="term-val">xlm</span><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">stellar-card</span> deposit address <span class="term-flag">--asset</span> <span class="term-val">xlm</span><br>
       <span class="term-output">&gt; GABC...WXYZ (send XLM here)</span><br><br>
       <span class="term-comment"># buy a $50 virtual visa</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">***REMOVED***</span> card buy <span class="term-flag">--amount</span> <span class="term-val">50.00</span><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">stellar-card</span> card buy <span class="term-flag">--amount</span> <span class="term-val">50.00</span><br>
       <span class="term-output">&gt; Card crd_abc ready — 4242 **** **** 4242</span><br><br>
       <span class="term-comment"># reveal card details</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">***REMOVED***</span> card show <span class="term-val">crd_abc</span><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">stellar-card</span> card show <span class="term-val">crd_abc</span><br>
       <span class="term-output">&gt; PAN: 4242424242424242 | Exp: 12/28 | CVC: 456</span>
     </div>
   </div>
@@ -628,7 +628,7 @@
     <h2>Built for the <span class="text-secondary">agentic</span> future</h2>
     <p style="max-width:640px;">
       AI agents increasingly need to make real-world purchases — SaaS, cloud compute, API credits, ad spend.
-      They hit a wall when payment is required. ***REMOVED*** removes that wall.
+      They hit a wall when payment is required. StellarCard removes that wall.
     </p>
     <div class="cards">
       <div class="surface-card">
@@ -679,7 +679,7 @@
       </div>
       <pre style="color:#93c5fd;margin:0;white-space:pre-wrap;"><code><span class="term-comment"># AI Agent: autonomous card purchase</span>
 result = subprocess.run(
-  ["***REMOVED***", "card", "buy",
+  ["stellar-card", "card", "buy",
    "--amount", "50",
    "--format", "json"],
   capture_output=True
@@ -763,7 +763,7 @@ else:
       <span class="term-comment"># fee vault contract on testnet</span><br>
       <span class="term-cmd">Contract ID:</span> <span class="term-val">NEXT_PUBLIC_FEE_VAULT_CONTRACT_ID</span><br><br>
       <span class="term-comment"># collects fees during card buy</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">***REMOVED***</span> card buy <span class="term-flag">--amount</span> <span class="term-val">25.00</span><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">stellar-card</span> card buy <span class="term-flag">--amount</span> <span class="term-val">25.00</span><br>
       <span class="term-output">&gt; Fee: 0.38 XLM ($0.15) | Tx: ...verified</span>
     </div>
   </div>
@@ -773,13 +773,13 @@ else:
 <!-- SLIDE 8 — Comparison -->
 <section class="slide slide--alt" id="s8">
   <div class="slide-inner">
-    <div class="tag tag--primary"><span class="icon" style="font-size:14px;">compare</span> Why ***REMOVED***</div>
+    <div class="tag tag--primary"><span class="icon" style="font-size:14px;">compare</span> Why StellarCard</div>
     <h2>How we compare</h2>
     <table class="compare-table">
       <thead>
         <tr>
           <th>Feature</th>
-          <th>***REMOVED***</th>
+          <th>StellarCard</th>
           <th>Exchange + Card</th>
           <th>Privacy / Wise</th>
         </tr>
@@ -876,7 +876,7 @@ else:
     <div class="flow" style="margin-top:2.5rem;">
       <div class="flow-step" style="border-color:var(--primary);">User / Agent</div>
       <div class="flow-arrow">&rarr;</div>
-      <div class="flow-step" style="border-color:var(--primary);">***REMOVED***</div>
+      <div class="flow-step" style="border-color:var(--primary);">stellar-card</div>
       <div class="flow-arrow">&rarr;</div>
       <div class="flow-step" style="border-color:var(--secondary);">Stellar Testnet</div>
       <div class="flow-arrow">&rarr;</div>
@@ -899,18 +899,18 @@ else:
         <span class="dot-yellow"></span>
         <span class="dot-green"></span>
       </div>
-      <span class="term-comment"># 1. install</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">npm install -g ***REMOVED***</span><br><br>
+      <span class="term-comment"># 1. clone &amp; build</span><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">git clone github.com/Batuhan4/stellar-card &amp;&amp; cargo build --release</span><br><br>
       <span class="term-comment"># 2. authenticate</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">***REMOVED***</span> auth login <span class="term-flag">--api-key</span> <span class="term-val">sk_test_...</span><br><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">stellar-card</span> auth login <span class="term-flag">--api-key</span> <span class="term-val">sk_test_...</span><br><br>
       <span class="term-comment"># 3. deposit XLM</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">***REMOVED***</span> deposit address <span class="term-flag">--asset</span> <span class="term-val">xlm</span><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">stellar-card</span> deposit address <span class="term-flag">--asset</span> <span class="term-val">xlm</span><br>
       <span class="term-output">&gt; GABC...WXYZ</span><br><br>
       <span class="term-comment"># 4. buy card</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">***REMOVED***</span> card buy <span class="term-flag">--amount</span> <span class="term-val">25.00</span><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">stellar-card</span> card buy <span class="term-flag">--amount</span> <span class="term-val">25.00</span><br>
       <span class="term-output">&gt; Card crd_abc123 created — $25.00</span><br><br>
       <span class="term-comment"># 5. reveal &amp; spend</span><br>
-      <span class="term-prompt">$</span> <span class="term-cmd">***REMOVED***</span> card show <span class="term-val">crd_abc123</span><br>
+      <span class="term-prompt">$</span> <span class="term-cmd">stellar-card</span> card show <span class="term-val">crd_abc123</span><br>
       <span style="color:#22c55e;">&#x2713;</span> <span class="term-output">4242 **** **** 1234 &nbsp; 12/28 &nbsp; CVC 456</span>
     </div>
   </div>
@@ -982,11 +982,11 @@ else:
       Stop giving 40% to middlemen. Start spending directly.
     </p>
     <div style="margin-top:2.5rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-      <a href="https://github.com/Batuhan4/***REMOVED***" class="cta-btn">
+      <a href="https://github.com/Batuhan4/stellar-card" class="cta-btn">
         GitHub <span class="icon" style="font-size:18px;">arrow_forward</span>
       </a>
       <div class="cta-btn-secondary" style="cursor:default;">
-        <code style="font-family:var(--font-mono);font-size:0.9rem;">npm install -g ***REMOVED***</code>
+        <code style="font-family:var(--font-mono);font-size:0.9rem;">cargo build --release</code>
       </div>
     </div>
     <p style="margin-top:3rem;font-size:0.85rem;color:var(--outline);">
