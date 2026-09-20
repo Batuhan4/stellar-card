@@ -11,7 +11,7 @@ export default function DashboardLayout({
       <MobileTopBar />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 md:ml-64 p-4 sm:p-8 pb-24 md:pb-8 min-h-screen">
+        <main className="flex-1 min-w-0 md:ml-64 p-4 sm:p-8 pb-24 md:pb-8 min-h-screen">
           {children}
         </main>
       </div>

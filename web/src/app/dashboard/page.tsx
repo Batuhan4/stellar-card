@@ -103,7 +103,7 @@ export default function DashboardPage() {
 
       <div className="grid lg:grid-cols-12 gap-8">
         {/* Active Cards */}
-        <section className="lg:col-span-7">
+        <section className="min-w-0 lg:col-span-7">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-headline font-bold text-lg">Card Inventory</h3>
             <Link href="/cards" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
@@ -165,7 +165,7 @@ export default function DashboardPage() {
                   }
                   animate3d
                 />
-                <div className="absolute -bottom-6 -right-6">
+                <div className="absolute -bottom-4 -right-2 sm:-bottom-6 sm:-right-6">
                   <CrabMascot size="sm" mood="idle" />
                 </div>
               </div>
@@ -174,7 +174,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Recent Deposits */}
-        <section className="lg:col-span-5">
+        <section className="min-w-0 lg:col-span-5">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-headline font-bold text-lg">Recent Deposits</h3>
             <Link href="/deposit" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
@@ -236,7 +236,7 @@ export default function DashboardPage() {
               <span className="text-[10px] uppercase tracking-widest">Quick Terminal</span>
             </div>
             <p className="text-green-400">$ stellar-card balance</p>
-            <p className="text-primary mt-1">{`{"ok":true,"data":{"balance":"...","currency":"xlm"}}`}</p>
+            <p className="text-primary mt-1 break-all">{`{"ok":true,"data":{"balance":"...","currency":"xlm"}}`}</p>
           </div>
         </section>
       </div>

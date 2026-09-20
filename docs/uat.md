@@ -152,6 +152,20 @@ and every card shown comes from Stripe through the edge API. `npm run build`
 (static export) and `npm run lint` pass; `STRIPE_TEST_KEY` lives only as a
 Pages secret.
 
+## Mobile layout audit (overflow + zoom-out)
+
+Every page reports `innerWidth === scrollWidth` at 320/360/390/430 px and at
+the 768 px tablet width — no horizontal overflow and no browser zoom-out
+(a previous failure mode: mobile Chrome shrank the layout to fit content, which
+made fixed-width overflow invisible to naive checks). `npm run test:e2e` now
+fails on either condition.
+
+Root causes fixed: flex/grid children without `min-w-0`, a fixed 440 px hero
+column, an unwrappable terminal code block, the deposit step row, the oversized
+wallet CTA in the mobile top bar, and the dashboard mascot offset. On phones the
+wallet CTA is labelled “Desktop wallet” and links to the Freighter extension,
+because browser extensions cannot run in mobile browsers.
+
 ## Full wallet E2E (real Freighter extension, live)
 
 The complete demo path was driven with the **real Freighter extension**

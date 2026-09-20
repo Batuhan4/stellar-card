@@ -20,10 +20,10 @@ const items = [
 export function MobileTopBar() {
   return (
     <header className="md:hidden sticky top-0 z-40 glass-panel border-b border-outline-variant/20">
-      <div className="flex items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between gap-3 px-4 py-3 min-w-0">
         <Link
           href="/"
-          className="font-headline text-lg font-black tracking-tighter text-slate-900"
+          className="font-headline text-lg font-black tracking-tighter text-slate-900 truncate"
         >
           StellarCard
         </Link>

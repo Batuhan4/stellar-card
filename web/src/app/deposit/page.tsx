@@ -83,23 +83,26 @@ export default function DepositPage() {
               <span className="w-2 h-2 rounded-full bg-tertiary animate-pulse" />
               <span className="text-[10px] uppercase tracking-widest font-bold text-tertiary">Network: Testnet</span>
             </div>
-            <p><span className="text-green-400">$</span> <span className="text-primary">stellar-card deposit address --asset {asset.toLowerCase()}</span></p>
+            <p className="break-all"><span className="text-green-400">$</span> <span className="text-primary">stellar-card deposit address --asset {asset.toLowerCase()}</span></p>
           </div>
         </div>
 
         {/* Progress Steps */}
-        <div className="flex items-center gap-2 sm:gap-4 mb-12">
+        <div className="grid grid-cols-3 gap-2 lg:flex lg:items-center lg:gap-4 mb-12">
           {["Select Asset", "Send Funds", "Confirmed"].map((label, i) => {
             const stepIndex = ["select", "awaiting", "confirmed"].indexOf(step);
             const isComplete = i < stepIndex;
             const isCurrent = i === stepIndex;
             return (
-              <div key={label} className="flex items-center gap-2 sm:gap-3">
+              <div
+                key={label}
+                className="flex flex-col items-center gap-1 lg:flex-row lg:gap-3"
+              >
                 <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-sm font-bold transition-all ${isComplete ? "bg-tertiary text-on-tertiary" : isCurrent ? "bg-primary text-on-primary" : "bg-surface-container-highest text-outline"}`}>
                   {isComplete ? <Icon name="check" className="text-sm" /> : i + 1}
                 </div>
-                <span className={`text-xs sm:text-sm font-medium whitespace-nowrap ${isCurrent ? "text-on-surface" : "text-outline"}`}>{label}</span>
-                {i < 2 && <div className={`w-5 sm:w-16 h-0.5 ${isComplete ? "bg-tertiary" : "bg-surface-container-highest"}`} />}
+                <span className={`text-[11px] lg:text-sm font-medium text-center lg:whitespace-nowrap ${isCurrent ? "text-on-surface" : "text-outline"}`}>{label}</span>
+                {i < 2 && <div className={`hidden lg:block w-16 h-0.5 ${isComplete ? "bg-tertiary" : "bg-surface-container-highest"}`} />}
               </div>
             );
           })}

@@ -21,8 +21,8 @@ export default function LandingPage() {
           <div className="absolute -top-24 -left-24 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px]" />
           <div className="absolute top-1/2 -right-24 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[100px]" />
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center w-full relative z-10">
-            <div className="space-y-8 animate-fade-in-up">
+          <div className="grid min-w-0 lg:grid-cols-2 gap-10 sm:gap-16 items-center w-full relative z-10">
+            <div className="space-y-6 sm:space-y-8 animate-fade-in-up min-w-0">
               <div className="inline-flex items-center gap-2 bg-surface-container-low px-4 py-1.5 rounded-full">
                 <span className="w-2 h-2 rounded-full bg-tertiary-container animate-pulse" />
                 <span className="text-[0.65rem] font-headline font-bold uppercase tracking-[0.2em] text-on-surface-variant">
@@ -30,12 +30,12 @@ export default function LandingPage() {
                 </span>
               </div>
 
-              <h1 className="text-6xl md:text-7xl font-headline font-bold leading-[0.9] tracking-tight text-on-surface">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-headline font-bold leading-[0.9] tracking-tight text-on-surface">
                 Virtual cards for{" "}
                 <span className="text-primary">agents</span> and developers
               </h1>
 
-              <p className="text-xl text-on-surface-variant max-w-md leading-relaxed">
+              <p className="text-base sm:text-xl text-on-surface-variant max-w-md leading-relaxed">
                 Fund with Stellar. Spend anywhere. The first CLI-native
                 infrastructure for instant global liquidity.
               </p>
@@ -56,8 +56,9 @@ export default function LandingPage() {
                     rel="noopener noreferrer"
                     className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
                   >
-                    <Icon name="account_balance_wallet" className="text-[18px]" />
-                    Install Freighter
+                    <Icon name="desktop_windows" className="text-[18px]" />
+                    <span className="sm:hidden">Desktop wallet only</span>
+                    <span className="hidden sm:inline">Install Freighter</span>
                   </a>
                 ) : (
                   <button
@@ -85,13 +86,13 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Visual — Stitch 3D hero with crab */}
-            <div className="relative h-[420px] sm:h-[600px] flex items-center justify-center scene-3d">
-              <div className="animate-float-3d relative scale-[0.68] sm:scale-100">
-                <div className="absolute -top-16 -left-6 z-30">
+            <div className="relative h-[320px] sm:h-[600px] w-full flex items-center justify-center scene-3d overflow-hidden">
+              <div className="animate-float-3d relative w-[300px] h-[200px] sm:w-[440px] sm:h-[280px]">
+                <div className="absolute -top-10 -left-4 sm:-top-16 sm:-left-6 z-30 origin-top-left scale-75 sm:scale-100">
                   <CrabMascot size="lg" mood="idle" />
                 </div>
 
-                <div className="animate-card-rotation relative z-20">
+                <div className="animate-card-rotation absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 origin-center scale-[0.66] sm:scale-100">
                   <div className="w-[440px] h-[280px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2rem] p-8 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden border border-white/10">
                     <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl" />
                     <div className="h-full flex flex-col justify-between relative z-10">
@@ -119,7 +120,7 @@ export default function LandingPage() {
                 <div className="absolute top-1/2 left-1/2 w-[30px] h-[20px] bg-gradient-to-br from-primary to-secondary rounded-sm pointer-events-none animate-boomerang z-50" />
               </div>
 
-              <div className="absolute -top-12 -left-20 glass-panel p-5 rounded-2xl shadow-soft-diffuse border border-white/50 w-64 z-30 animate-fade-in-up delay-500">
+              <div className="hidden sm:block absolute -top-12 -left-20 glass-panel p-5 rounded-2xl shadow-soft-diffuse border border-white/50 w-64 z-30 animate-fade-in-up delay-500">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center">
                     <Icon name="account_balance_wallet" className="text-on-tertiary-fixed text-[18px]" filled />
@@ -132,7 +133,7 @@ export default function LandingPage() {
                 <div className="text-[11px] text-on-surface-variant font-mono">+ 42.50 XLM confirmed</div>
               </div>
 
-              <div className="absolute -bottom-8 -right-16 glass-panel p-5 rounded-2xl shadow-soft-diffuse border border-white/50 w-60 z-30 animate-fade-in-up delay-700">
+              <div className="hidden sm:block absolute -bottom-8 -right-16 glass-panel p-5 rounded-2xl shadow-soft-diffuse border border-white/50 w-60 z-30 animate-fade-in-up delay-700">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center">
                     <Icon name="verified" className="text-primary text-[18px]" />
@@ -178,7 +179,7 @@ export default function LandingPage() {
                     </div>
                     <h3 className="text-2xl font-headline font-bold mb-4">{item.title}</h3>
                     <p className="text-on-surface-variant leading-relaxed mb-6">{item.desc}</p>
-                    <div className="bg-inverse-surface text-inverse-on-surface font-mono text-xs rounded-lg p-3">
+                    <div className="bg-inverse-surface text-inverse-on-surface font-mono text-xs rounded-lg p-3 break-all">
                       <span className="text-green-400">$ </span><span className="text-primary-fixed-dim">{item.code}</span>
                     </div>
                   </div>
@@ -190,7 +191,7 @@ export default function LandingPage() {
 
         {/* Agent Pitch */}
         <section id="security" className="py-20 px-8 max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+          <div className="grid min-w-0 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
             <div className="animate-fade-in-up">
               <h2 className="text-4xl md:text-5xl font-headline font-bold text-on-surface mb-8 tracking-tight">
                 Built for the <br /><span className="text-secondary">Agentic Future</span>
@@ -207,14 +208,14 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="bg-inverse-surface rounded-2xl p-6 font-mono text-sm shadow-soft-diffuse animate-fade-in-up delay-200">
+            <div className="min-w-0 overflow-hidden bg-inverse-surface rounded-2xl p-4 sm:p-6 font-mono text-xs sm:text-sm shadow-soft-diffuse animate-fade-in-up delay-200">
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-3 h-3 rounded-full bg-error/60" />
                 <span className="w-3 h-3 rounded-full bg-amber-400/60" />
                 <span className="w-3 h-3 rounded-full bg-green-400/60" />
                 <span className="text-slate-500 text-xs ml-2">agent_workflow.py</span>
               </div>
-              <pre className="text-primary-fixed-dim overflow-x-auto leading-relaxed"><code>{`# AI Agent: autonomous card purchase
+              <pre className="text-primary-fixed-dim overflow-x-auto whitespace-pre-wrap break-words leading-relaxed"><code>{`# AI Agent: autonomous card purchase
 result = subprocess.run(
   ["stellar-card", "card", "buy",
    "--amount", "50",

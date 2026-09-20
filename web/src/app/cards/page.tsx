@@ -43,6 +43,7 @@ export default function CardRevealPage() {
     signTransaction,
     error: walletError,
     networkOk,
+    installed,
   } = useWallet();
   const { balance, unfunded, refresh } = useBalance();
   const [revealed, setRevealed] = useState(false);
@@ -324,7 +325,7 @@ export default function CardRevealPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Card Reveal Stage */}
-          <section className="lg:col-span-7 space-y-6">
+          <section className="min-w-0 lg:col-span-7 space-y-6">
             <div className="relative w-full max-w-md mx-auto h-[230px] sm:h-[280px] perspective-1000">
               <m.div
                 className="relative w-full h-full preserve-3d cursor-pointer"
@@ -490,6 +491,16 @@ export default function CardRevealPage() {
                 </div>
               </div>
 
+              {!connected && installed === false && (
+                <div className="mb-5 flex items-start gap-2 rounded-xl bg-surface-container p-4 text-xs text-on-surface-variant">
+                  <Icon name="info" className="text-sm mt-0.5" />
+                  <span>
+                    Freighter is a browser extension for desktop browsers.
+                    Install it on desktop (or use the CLI) to connect and pay.
+                  </span>
+                </div>
+              )}
+
               {connected && networkOk === false && (
                 <div className="mb-5 flex items-start gap-2 rounded-xl bg-error-container/40 p-4 text-xs text-error">
                   <Icon name="error" className="text-sm mt-0.5" />
@@ -620,7 +631,7 @@ export default function CardRevealPage() {
           </section>
 
           {/* Card Info Panel */}
-          <section className="lg:col-span-5 space-y-6">
+          <section className="min-w-0 lg:col-span-5 space-y-6">
             <div className="bg-surface-container-lowest rounded-xl p-6 shadow-soft-diffuse shadow-soft-diffuse animate-slide-in-right delay-200">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-headline font-bold text-lg">Card Details</h3>
@@ -746,7 +757,7 @@ export default function CardRevealPage() {
                 <span className="text-[10px] uppercase tracking-widest">CLI Equivalent</span>
               </div>
               <p className="text-green-400">$ stellar-card card show {cardDetails.id}</p>
-              <p className="text-primary mt-1">{`{"ok":true,"data":{"last4":"${card.last4}","exp":"${cardDetails.exp}","status":"${cardDetails.status}"}}`}</p>
+              <p className="text-primary mt-1 break-all">{`{"ok":true,"data":{"last4":"${card.last4}","exp":"${cardDetails.exp}","status":"${cardDetails.status}"}}`}</p>
             </div>
           </section>
         </div>

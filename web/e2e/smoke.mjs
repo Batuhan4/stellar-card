@@ -66,13 +66,14 @@ for (const vp of VIEWPORTS) {
     }
     await page.waitForTimeout(1000);
 
-    const overflow = await page.evaluate(() => {
+    const overflow = await page.evaluate((expectedWidth) => {
       const doc = document.documentElement;
       const offenders = [];
-      if (doc.scrollWidth > window.innerWidth + 1) {
+      const zoomedOut = window.innerWidth !== expectedWidth;
+      if (doc.scrollWidth > expectedWidth + 1 || zoomedOut) {
         for (const el of Array.from(document.querySelectorAll("body *"))) {
           const rect = el.getBoundingClientRect();
-          if (rect.right > window.innerWidth + 1 && rect.width > 24) {
+          if (rect.right > doc.clientWidth + 1 && rect.width > 24) {
             offenders.push(
               `${el.tagName.toLowerCase()}.${String(el.className).split(" ").slice(0, 2).join(".")} right=${Math.round(rect.right)}`
             );
@@ -80,19 +81,24 @@ for (const vp of VIEWPORTS) {
           if (offenders.length >= 5) break;
         }
       }
-      return { overflow: doc.scrollWidth > window.innerWidth + 1, offenders };
-    });
+      return {
+        overflow: doc.scrollWidth > expectedWidth + 1,
+        zoomedOut,
+        offenders,
+      };
+    }, vp.width);
 
     const slug = path === "/" ? "home" : path.slice(1).replace(/\//g, "-");
     await page.screenshot({ path: `${OUT}/${slug}-${vp.name}.png`, fullPage: true });
 
     checks += 1;
-    if (status !== 200 || overflow.overflow || consoleErrors.length || pageErrors.length || failed.length) {
+    if (status !== 200 || overflow.overflow || overflow.zoomedOut || consoleErrors.length || pageErrors.length || failed.length) {
       failures.push({
         viewport: vp.name,
         path,
         status,
         overflow: overflow.overflow,
+        zoomedOut: overflow.zoomedOut,
         offenders: overflow.offenders,
         consoleErrors: consoleErrors.slice(0, 3),
         pageErrors: pageErrors.slice(0, 3),

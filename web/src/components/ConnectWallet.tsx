@@ -11,16 +11,27 @@ export function ConnectWallet() {
 
   if (installed === false) {
     return (
-      <a
-        href="https://www.freighter.app/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm text-white shadow-lg transition-all hover:opacity-90"
-        style={{ background: "linear-gradient(135deg, #0043eb, #3962ff)" }}
-      >
-        <Icon name="account_balance_wallet" className="text-[18px]" filled />
-        Install Freighter
-      </a>
+      <>
+        <a
+          href="https://www.freighter.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden sm:inline-flex items-center gap-2 px-4 py-2 sm:px-7 sm:py-3 rounded-xl font-semibold text-xs sm:text-sm text-white shadow-lg transition-all hover:opacity-90"
+          style={{ background: "linear-gradient(135deg, #0043eb, #3962ff)" }}
+        >
+          <Icon name="account_balance_wallet" className="text-[18px]" filled />
+          Install Freighter
+        </a>
+        <a
+          href="https://www.freighter.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="sm:hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-[11px] bg-surface-container text-on-surface-variant"
+        >
+          <Icon name="desktop_windows" className="text-[16px]" />
+          Desktop wallet
+        </a>
+      </>
     );
   }
 
@@ -47,7 +58,7 @@ export function ConnectWallet() {
       <button
         onClick={connect}
         disabled={connecting}
-        className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-semibold text-sm text-white shadow-lg transition-all hover:opacity-90 disabled:opacity-60"
+        className="inline-flex items-center gap-2 px-4 py-2 sm:px-7 sm:py-3 rounded-xl font-semibold text-xs sm:text-sm text-white shadow-lg transition-all hover:opacity-90 disabled:opacity-60"
         style={{ background: "linear-gradient(135deg, #0043eb, #3962ff)" }}
       >
         <Icon name="account_balance_wallet" className="text-[18px]" filled />

@@ -11,7 +11,7 @@ export default function CardsLayout({
       <MobileTopBar />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 md:ml-64 pb-24 md:pb-0 min-h-screen">{children}</main>
+        <main className="flex-1 min-w-0 md:ml-64 pb-24 md:pb-0 min-h-screen">{children}</main>
       </div>
       <MobileBottomNav />
     </div>
