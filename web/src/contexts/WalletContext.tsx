@@ -34,6 +34,7 @@ interface WalletContextValue {
   installed: boolean | null;
   connecting: boolean;
   error: string | null;
+  networkOk: boolean | null;
   connect: () => Promise<void>;
   disconnect: () => void;
   signTransaction: (
@@ -44,11 +45,15 @@ interface WalletContextValue {
 
 const WalletContext = createContext<WalletContextValue | null>(null);
 
+const WRONG_NETWORK_MESSAGE =
+  "Freighter is on a different network. Open Freighter → Settings → Network → Testnet, then reconnect.";
+
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
   const [installed, setInstalled] = useState<boolean | null>(null);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [networkOk, setNetworkOk] = useState<boolean | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -69,9 +74,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         if (!current.error && current.address) {
           const network = await getNetwork();
           if (cancelled) return;
-          if (network.error || network.networkPassphrase === NETWORK_PASSPHRASE) {
-            setAddress(current.address);
-          }
+          const correct =
+            !network.error &&
+            network.networkPassphrase === NETWORK_PASSPHRASE;
+          setNetworkOk(correct);
+          setAddress(current.address);
+          if (!correct) setError(WRONG_NETWORK_MESSAGE);
         }
       } catch {
         if (!cancelled) setInstalled(false);
@@ -89,13 +97,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setError(null);
     try {
       const network = await getNetwork();
-      if (
-        !network.error &&
-        network.networkPassphrase !== NETWORK_PASSPHRASE
-      ) {
-        setError("Freighter is not on Testnet. Switch networks in the extension.");
-        return;
-      }
+      const correct =
+        !network.error && network.networkPassphrase === NETWORK_PASSPHRASE;
+      setNetworkOk(correct);
+      if (!correct) setError(WRONG_NETWORK_MESSAGE);
+
       const access = await requestAccess();
       if (access.error) {
         setError(access.error.message || "Freighter denied access");
@@ -119,10 +125,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const disconnect = useCallback(() => {
     setAddress(null);
     setError(null);
+    setNetworkOk(null);
   }, []);
 
   const signTransaction = useCallback(
     async (xdr: string, opts?: SignOptions) => {
+      if (networkOk === false) {
+        throw new Error(WRONG_NETWORK_MESSAGE);
+      }
       const result = await freighterSignTransaction(xdr, {
         networkPassphrase: opts?.networkPassphrase ?? NETWORK_PASSPHRASE,
         address: opts?.address ?? address ?? undefined,
@@ -137,7 +147,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         signerAddress: result.signerAddress,
       };
     },
-    [address]
+    [address, networkOk]
   );
 
   const value = useMemo<WalletContextValue>(
@@ -147,6 +157,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       installed,
       connecting,
       error,
+      networkOk,
       connect,
       disconnect,
       signTransaction,
@@ -156,6 +167,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       installed,
       connecting,
       error,
+      networkOk,
       connect,
       disconnect,
       signTransaction,

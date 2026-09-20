@@ -6,7 +6,7 @@ import { contract } from "@stellar/stellar-sdk";
 import { Icon } from "@/components/Icon";
 import { CrabMascot } from "@/components/CrabMascot";
 import { useWallet } from "@/contexts/WalletContext";
-import { useLocalStorage } from "@/hooks/useStellar";
+import { useBalance, useLocalStorage } from "@/hooks/useStellar";
 import {
   DEFAULT_FIXED_FEE_CENTS,
   FEE_VAULT_CONTRACT_ID,
@@ -18,6 +18,7 @@ import {
   explorerContractUrl,
   explorerTxUrl,
   freezeCardViaApi,
+  friendbotUrl,
   generateFeeReference,
   getCard,
   groupCardNumber,
@@ -34,7 +35,16 @@ import {
 const XLM_PRICE_URL = "https://api.coinbase.com/v2/prices/XLM-USD/spot";
 
 export default function CardRevealPage() {
-  const { address, connected, connecting, connect, signTransaction } = useWallet();
+  const {
+    address,
+    connected,
+    connecting,
+    connect,
+    signTransaction,
+    error: walletError,
+    networkOk,
+  } = useWallet();
+  const { balance, unfunded, refresh } = useBalance();
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [cardholderName, setCardholderName] = useLocalStorage(
@@ -139,6 +149,10 @@ export default function CardRevealPage() {
   const feeXlm = feeStroops !== null ? Number(feeStroops) / STROOPS_PER_XLM : null;
   const amountValid = amountCents >= 500 && amountCents <= 50_000;
   const contractConfigured = isFeeVaultConfigured();
+  const needsFunding =
+    connected &&
+    (unfunded === true ||
+      (balance !== null && feeXlm !== null && balance < feeXlm));
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text.replace(/\s/g, ""));
@@ -157,6 +171,20 @@ export default function CardRevealPage() {
     setActiveCard(card);
     setRevealed(false);
     await loadCards(cardholderEmail.trim().toLowerCase());
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const showPurchaseError = (message: string) => {
+    setPurchaseError(message);
+    if (typeof window !== "undefined") {
+      setTimeout(() => {
+        document
+          .getElementById("purchase-error")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 60);
+    }
   };
 
   const buyCard = async () => {
@@ -218,7 +246,7 @@ export default function CardRevealPage() {
       setPurchaseHash(hash);
       await issueCard(hash);
     } catch (error) {
-      setPurchaseError(
+      showPurchaseError(
         error instanceof Error ? error.message : "Fee payment failed"
       );
     } finally {
@@ -233,7 +261,7 @@ export default function CardRevealPage() {
     try {
       await issueCard(purchaseHash);
     } catch (error) {
-      setPurchaseError(
+      showPurchaseError(
         error instanceof Error ? error.message : "Card issuance failed"
       );
     } finally {
@@ -462,6 +490,60 @@ export default function CardRevealPage() {
                 </div>
               </div>
 
+              {connected && networkOk === false && (
+                <div className="mb-5 flex items-start gap-2 rounded-xl bg-error-container/40 p-4 text-xs text-error">
+                  <Icon name="error" className="text-sm mt-0.5" />
+                  <div>
+                    <p className="font-bold">Freighter is on the wrong network</p>
+                    <p className="mt-1">
+                      Open Freighter → Settings → Network → Testnet, then
+                      reconnect. Payments are disabled until then.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {needsFunding && address && (
+                <div className="mb-5 rounded-xl bg-amber-500/10 p-4 text-xs text-amber-700">
+                  <div className="flex items-start gap-2">
+                    <Icon name="warning" className="text-sm mt-0.5" />
+                    <div>
+                      <p className="font-bold">
+                        This account has no testnet XLM yet
+                      </p>
+                      <p className="mt-1">
+                        The card fee is paid in XLM, so fund the connected
+                        account first.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <a
+                      href={friendbotUrl(address)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-tertiary/10 text-tertiary rounded-lg font-bold"
+                    >
+                      <Icon name="water_drop" className="text-base" /> Fund with
+                      Friendbot
+                    </a>
+                    <button
+                      onClick={refresh}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-surface-container rounded-lg font-bold text-on-surface"
+                    >
+                      <Icon name="refresh" className="text-base" /> Refresh
+                      balance
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {connected && walletError && networkOk !== false && (
+                <div className="mb-5 rounded-xl bg-error-container/40 p-4 text-xs text-error">
+                  {walletError}
+                </div>
+              )}
+
               {purchaseHash && (
                 <div className="mb-5 flex items-start gap-2 rounded-xl bg-tertiary/10 p-4 text-xs">
                   <Icon name="check_circle" className="text-sm text-tertiary mt-0.5" filled />
@@ -490,7 +572,10 @@ export default function CardRevealPage() {
               )}
 
               {purchaseError && (
-                <div className="mb-5 flex items-start gap-2 rounded-xl bg-error-container/40 p-4 text-xs text-error">
+                <div
+                  id="purchase-error"
+                  className="mb-5 flex items-start gap-2 rounded-xl bg-error-container/40 p-4 text-xs text-error"
+                >
                   <Icon name="error" className="text-sm mt-0.5" />
                   <span className="break-all">{purchaseError}</span>
                 </div>
@@ -498,7 +583,15 @@ export default function CardRevealPage() {
 
               <button
                 onClick={connected ? buyCard : connect}
-                disabled={buying || connecting || (connected && (!contractConfigured || !amountValid))}
+                disabled={
+                  buying ||
+                  connecting ||
+                  (connected &&
+                    (!contractConfigured ||
+                      !amountValid ||
+                      networkOk === false ||
+                      needsFunding))
+                }
                 className="w-full py-4 bg-primary text-on-primary rounded-xl font-bold text-sm shadow-lg shadow-primary-container/20 hover:shadow-primary-container/40 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {buying
@@ -506,7 +599,11 @@ export default function CardRevealPage() {
                   : connecting
                     ? "Connecting..."
                     : connected
-                      ? `Pay $${(feeCents / 100).toFixed(2)} Fee with Freighter`
+                      ? networkOk === false
+                        ? "Switch Freighter to Testnet"
+                        : needsFunding
+                          ? "Fund account with Friendbot first"
+                          : `Pay $${(feeCents / 100).toFixed(2)} Fee with Freighter`
                       : "Connect Freighter to Buy"}
               </button>
               {contractConfigured && (

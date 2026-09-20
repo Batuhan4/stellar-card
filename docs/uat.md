@@ -152,6 +152,27 @@ and every card shown comes from Stripe through the edge API. `npm run build`
 (static export) and `npm run lint` pass; `STRIPE_TEST_KEY` lives only as a
 Pages secret.
 
+## Full wallet E2E (real Freighter extension, live)
+
+The complete demo path was driven with the **real Freighter extension**
+(v5.48.0, unpacked, headless Chromium) and a funded testnet key
+(`GB3JDW…BDQBYX`), against `https://card.batuhan4.com` on 2026-09-20:
+
+| Step | Result |
+|---|---|
+| Wallet unlock + network | unlocked with password, switched to **Test Net** in the extension |
+| Connect | Freighter connection-request popup → `Connect anyway` → site shows `GB3JDW…BDQBYX` |
+| Home hero CTA | after connect it reads **“Go to Dashboard”** (was a static “Connect Wallet” link) |
+| Pay | Freighter confirm-transaction popup (`fee 0.0055858 XLM`) → real Soroban `collect_fee` |
+| Fee transactions | `f94de21e89f01196a8b573cb6c7ac198954f7bf28da1a65209d72c1adb214993`, `22fbfc4a8f853bf0e9619a129a6578a0a8497fa57ee0a058a4febfae577c5441` |
+| Card issuance | real Stripe test cards via the edge function, e.g. `ic_1UHeJzEAzMrENaFXHHP57gdm` (last4 `0237`) |
+| Reveal | real PAN `4000 0099 9000 0237`, expiry `11/29`, CVC `123` |
+| Wrong-network path | wallet on Mainnet → site keeps the session, shows a banner and disables payment with “Switch Freighter to Testnet” |
+
+Automation notes: the wallet harness lives outside the repo (extension build,
+persistent Chrome profile, mnemonic) because it is environment-specific; the
+repo’s `npm run test:e2e` covers page/browser health and the reveal API flow.
+
 ## Browser E2E (Playwright, live demo)
 
 `npm --prefix web run test:e2e` drives the deployed demo in headless Chromium:

@@ -5,9 +5,13 @@ import { Navbar } from "@/components/Navbar";
 import { MobileBottomNav } from "@/components/MobileNav";
 import { CrabMascot } from "@/components/CrabMascot";
 import { Icon } from "@/components/Icon";
+import { useWallet } from "@/contexts/WalletContext";
 import Link from "next/link";
 
 export default function LandingPage() {
+  const { connected, connecting, installed, error, networkOk, connect } =
+    useWallet();
+
   return (
     <LazyMotion features={domAnimation} strict>
       <Navbar />
@@ -37,17 +41,47 @@ export default function LandingPage() {
               </p>
 
               <div className="flex flex-wrap gap-4 pt-4">
-                <Link
-                  href="/dashboard"
-                  className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
-                >
-                  Connect Wallet
-                  <Icon name="arrow_forward" className="text-[18px]" />
-                </Link>
+                {connected ? (
+                  <Link
+                    href="/dashboard"
+                    className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
+                  >
+                    Go to Dashboard
+                    <Icon name="arrow_forward" className="text-[18px]" />
+                  </Link>
+                ) : installed === false ? (
+                  <a
+                    href="https://www.freighter.app/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
+                  >
+                    <Icon name="account_balance_wallet" className="text-[18px]" />
+                    Install Freighter
+                  </a>
+                ) : (
+                  <button
+                    onClick={connect}
+                    disabled={connecting}
+                    className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all disabled:opacity-60"
+                  >
+                    <Icon name="account_balance_wallet" className="text-[18px]" />
+                    {connecting ? "Connecting..." : "Connect Freighter"}
+                  </button>
+                )}
                 <a href="#how-it-works" className="px-8 py-4 bg-surface-container-highest text-on-surface rounded-xl font-bold hover:bg-surface-variant transition-all">
                   View CLI Docs
                 </a>
               </div>
+              {connected && networkOk === false && (
+                <p className="text-xs text-error max-w-md">
+                  Freighter is on a different network. Open Freighter → Settings →
+                  Network → Testnet, then reconnect.
+                </p>
+              )}
+              {error && !connected && (
+                <p className="text-xs text-error max-w-md">{error}</p>
+              )}
             </div>
 
             {/* Right: Visual — Stitch 3D hero with crab */}

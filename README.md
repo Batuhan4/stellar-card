@@ -240,6 +240,10 @@ static export on Cloudflare Pages with edge functions.
 Stripe secrets never reach the browser: `STRIPE_TEST_KEY` is a Pages secret, and
 the only public configuration is `NEXT_PUBLIC_FEE_VAULT_CONTRACT_ID`.
 
+Freighter must be on **Testnet** (Freighter → Settings → Network → Testnet). If
+it is on another network, the site keeps the account connected, shows a banner
+with the exact steps, and disables payment until it is switched.
+
 ```bash
 cd web
 npm install
