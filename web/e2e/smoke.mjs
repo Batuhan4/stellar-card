@@ -16,7 +16,7 @@ import { mkdirSync } from "node:fs";
 
 const BASE = process.env.E2E_BASE_URL ?? "https://card.batuhan4.com";
 const OUT = process.env.E2E_OUT ?? new URL("./artifacts/", import.meta.url).pathname;
-const PAGES = ["/", "/dashboard", "/deposit", "/cards"];
+const PAGES = ["/", "/quick", "/dashboard", "/deposit", "/cards"];
 const VIEWPORTS = [
   { name: "mobile-390x844", width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },
   { name: "mobile-360x800", width: 360, height: 800, isMobile: true, hasTouch: true, deviceScaleFactor: 2 },

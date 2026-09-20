@@ -259,6 +259,23 @@ npx wrangler pages deploy --project-name stellar-card --branch main
 Edge API surface: `POST /api/card` (issue), `GET /api/card/:id`,
 `POST /api/card/:id/freeze`, `GET /api/cards?email=`.
 
+### ⚡ Quick Buy (TRY demo preview)
+
+[`/quick`](https://card.batuhan4.com/quick) is a three-tap flow for people with
+zero Stellar knowledge: pick a TRY amount, get an IBAN + reference, tap
+“I’ve sent the TRY”, and the card appears. It needs no wallet and works on
+phones.
+
+Honest boundaries: there is still no live TRY-capable Stellar anchor (see
+[TRY on-ramp readiness](#try-on-ramp-readiness)), so the TRY transfer and
+conversion stages are simulated in the UI. The issued card is a real Stripe
+**test-mode** card: it is created by the edge function, flagged
+`metadata[demo]=quick-buy-try` in Stripe and in KV, shown with a
+“demo · test mode” badge, and rate-limited (5/day per email, 12/day per
+network). It does not touch the fee vault. The standard `/api/card` flow —
+on-chain fee verified on Horizon before issuance — is unchanged and remains the
+production path.
+
 The UI is responsive (bottom navigation and compact layouts on mobile) and
 carries the project mascot — the 3D crab holding a Lumen Card — animated with CSS
 for idle, anxious, cheer, and peek states. Mascot artwork supplied by the project

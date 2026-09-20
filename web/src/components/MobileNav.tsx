@@ -12,6 +12,7 @@ const ConnectWallet = dynamic(
 
 const items = [
   { href: "/", icon: "home", label: "Home" },
+  { href: "/quick", icon: "bolt", label: "Quick" },
   { href: "/dashboard", icon: "dashboard", label: "Overview" },
   { href: "/deposit", icon: "account_balance_wallet", label: "Deposit" },
   { href: "/cards", icon: "credit_card", label: "Cards" },
@@ -38,7 +39,7 @@ export function MobileBottomNav() {
 
   return (
     <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 glass-panel border-t border-outline-variant/20 pb-[env(safe-area-inset-bottom)]">
-      <div className="grid grid-cols-4">
+      <div className="grid grid-cols-5">
         {items.map((item) => {
           const active =
             item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -46,7 +47,7 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 py-3 text-[10px] font-medium transition-colors ${
+              className={`flex flex-col items-center gap-1 py-3 text-[9px] font-medium transition-colors ${
                 active ? "text-primary" : "text-slate-500"
               }`}
             >

@@ -62,6 +62,7 @@ export const onRequestGet = async (context: Context): Promise<Response> => {
         created: card.created ?? 0,
         amountUsd: mapping?.amountUsd ?? null,
         feeTxHash: mapping?.txHash ?? null,
+        demo: mapping?.demo ?? false,
       });
     }
     return json({ ok: true, cards: result });

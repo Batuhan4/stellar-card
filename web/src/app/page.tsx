@@ -40,11 +40,21 @@ export default function LandingPage() {
                 infrastructure for instant global liquidity.
               </p>
 
-              <div className="flex flex-wrap gap-4 pt-4">
+              <div className="flex flex-wrap gap-3 pt-4">
+                <Link
+                  href="/quick"
+                  className="px-6 sm:px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
+                >
+                  <Icon name="bolt" className="text-[18px]" filled />
+                  Quick Buy with TRY
+                  <span className="text-[10px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded-full">
+                    demo
+                  </span>
+                </Link>
                 {connected ? (
                   <Link
                     href="/dashboard"
-                    className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
+                    className="px-6 sm:px-8 py-4 bg-surface-container-highest text-on-surface rounded-xl font-bold flex items-center gap-3 hover:bg-surface-variant transition-all"
                   >
                     Go to Dashboard
                     <Icon name="arrow_forward" className="text-[18px]" />
@@ -54,7 +64,7 @@ export default function LandingPage() {
                     href="https://www.freighter.app/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
+                    className="px-6 sm:px-8 py-4 bg-surface-container-highest text-on-surface rounded-xl font-bold flex items-center gap-3 hover:bg-surface-variant transition-all"
                   >
                     <Icon name="desktop_windows" className="text-[18px]" />
                     <span className="sm:hidden">Desktop wallet only</span>
@@ -64,15 +74,12 @@ export default function LandingPage() {
                   <button
                     onClick={connect}
                     disabled={connecting}
-                    className="px-8 py-4 bg-primary text-on-primary rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all disabled:opacity-60"
+                    className="px-6 sm:px-8 py-4 bg-surface-container-highest text-on-surface rounded-xl font-bold flex items-center gap-3 hover:bg-surface-variant transition-all disabled:opacity-60"
                   >
                     <Icon name="account_balance_wallet" className="text-[18px]" />
                     {connecting ? "Connecting..." : "Connect Freighter"}
                   </button>
                 )}
-                <a href="#how-it-works" className="px-8 py-4 bg-surface-container-highest text-on-surface rounded-xl font-bold hover:bg-surface-variant transition-all">
-                  View CLI Docs
-                </a>
               </div>
               {connected && networkOk === false && (
                 <p className="text-xs text-error max-w-md">
@@ -86,7 +93,7 @@ export default function LandingPage() {
             </div>
 
             {/* Right: Visual — Stitch 3D hero with crab */}
-            <div className="relative h-[320px] sm:h-[600px] w-full flex items-center justify-center scene-3d overflow-hidden">
+            <div className="relative h-[320px] sm:h-[600px] w-full flex items-center justify-center scene-3d">
               <div className="animate-float-3d relative w-[300px] h-[200px] sm:w-[440px] sm:h-[280px]">
                 <div className="absolute -top-10 -left-4 sm:-top-16 sm:-left-6 z-30 origin-top-left scale-75 sm:scale-100">
                   <CrabMascot size="lg" mood="idle" />

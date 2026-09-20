@@ -152,6 +152,19 @@ and every card shown comes from Stripe through the edge API. `npm run build`
 (static export) and `npm run lint` pass; `STRIPE_TEST_KEY` lives only as a
 Pages secret.
 
+## Quick Buy (TRY demo) — live
+
+`/quick` (amount → demo IBAN + reference → simulated TRY transfer → card) was
+clicked through on a mobile viewport with Playwright against production:
+
+| Item | Value |
+|---|---|
+| Result | card issued, demo badge shown, real PAN/CVC rendered, no console errors |
+| Example card | last4 `0252` (`4000 0099 9000 0252`, CVC `123`), `metadata[demo]=quick-buy-try` |
+| Rate-limit evidence | cards `ic_1UHfVS…` (last4 `0302`) from the limit probe; 6th request in 24 h for one email → HTTP `429` |
+| Limits | 5 demo cards/day/email, 12/day/IP; recorded in Cloudflare KV |
+| Honesty | TRY leg simulated (no live TRY anchor exists); card is Stripe test mode; `/api/card` on-chain-fee path unchanged |
+
 ## Mobile layout audit (overflow + zoom-out)
 
 Every page reports `innerWidth === scrollWidth` at 320/360/390/430 px and at
@@ -162,7 +175,9 @@ fails on either condition.
 
 Root causes fixed: flex/grid children without `min-w-0`, a fixed 440 px hero
 column, an unwrappable terminal code block, the deposit step row, the oversized
-wallet CTA in the mobile top bar, and the dashboard mascot offset. On phones the
+wallet CTA in the mobile top bar, and the dashboard mascot offset. The landing
+hero card also no longer mirrors: its 360° flip is now a ±14° sway, and the
+decorative status panels are no longer clipped. On phones the
 wallet CTA is labelled “Desktop wallet” and links to the Freighter extension,
 because browser extensions cannot run in mobile browsers.
 

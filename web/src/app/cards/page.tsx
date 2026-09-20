@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { contract } from "@stellar/stellar-sdk";
 import { Icon } from "@/components/Icon";
@@ -421,6 +422,21 @@ export default function CardRevealPage() {
                 <h3 className="font-headline font-bold text-lg">Buy a Card</h3>
                 <span className="text-[10px] font-mono text-outline uppercase tracking-widest">Stellar Testnet</span>
               </div>
+              <Link
+                href="/quick"
+                className="mb-5 flex items-center justify-between gap-3 rounded-xl bg-primary/5 border border-primary/20 p-4 text-xs"
+              >
+                <span>
+                  <span className="font-bold text-primary block">
+                    No wallet? Quick Buy with TRY (demo)
+                  </span>
+                  <span className="text-on-surface-variant">
+                    IBAN → card in three taps, no Stellar knowledge needed.
+                  </span>
+                </span>
+                <Icon name="arrow_forward" className="text-primary shrink-0" />
+              </Link>
+
               <p className="text-xs text-on-surface-variant mb-5">
                 The $0.10 + 0.20% fee is collected on-chain by the Soroban fee vault.
                 A Cloudflare edge function then verifies that transaction on Horizon and

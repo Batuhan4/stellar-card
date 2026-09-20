@@ -109,6 +109,7 @@ export interface IssuedCard {
   amountUsd: number;
   holderName: string;
   feeTxHash: string;
+  demo: boolean;
 }
 
 export interface CardSummary {
@@ -120,6 +121,7 @@ export interface CardSummary {
   created: number;
   amountUsd: number | null;
   feeTxHash: string | null;
+  demo: boolean;
 }
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
@@ -153,6 +155,19 @@ export async function issueCardViaApi(input: {
   email: string;
 }): Promise<IssuedCard> {
   const body = await api<{ card: IssuedCard }>("/api/card", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+  return body.card;
+}
+
+export async function quickCardViaApi(input: {
+  amountUsd: number;
+  name: string;
+  email: string;
+  reference: string;
+}): Promise<IssuedCard> {
+  const body = await api<{ card: IssuedCard }>("/api/quick-card", {
     method: "POST",
     body: JSON.stringify(input),
   });

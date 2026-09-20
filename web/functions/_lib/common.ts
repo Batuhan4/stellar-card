@@ -54,6 +54,7 @@ export interface CardMapping {
   txHash: string;
   amountUsd: number;
   name: string;
+  demo?: boolean;
 }
 
 export const DEFAULT_HORIZON_URL = "https://horizon-testnet.stellar.org";
@@ -282,11 +283,17 @@ export interface SerializedCard {
   amountUsd: number;
   holderName: string;
   feeTxHash: string;
+  demo: boolean;
 }
 
 export function serializeCard(
   card: StripeCard,
-  extra: { amountUsd: number; holderName: string; feeTxHash: string }
+  extra: {
+    amountUsd: number;
+    holderName: string;
+    feeTxHash: string;
+    demo?: boolean;
+  }
 ): SerializedCard {
   const brand = card.brand ?? "visa";
   return {
@@ -303,6 +310,7 @@ export function serializeCard(
     amountUsd: extra.amountUsd,
     holderName: extra.holderName,
     feeTxHash: extra.feeTxHash,
+    demo: extra.demo ?? false,
   };
 }
 

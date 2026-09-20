@@ -127,10 +127,9 @@
 }
 
 @keyframes card-rotation-sequence {
-  0% { transform: rotateY(0deg) rotateX(0deg); }
-  20% { transform: rotateY(180deg) scale(0.9); }
-  40% { transform: rotateY(360deg) scale(1); }
-  100% { transform: rotateY(360deg); }
+  0% { transform: rotateY(-14deg) rotateX(5deg); }
+  50% { transform: rotateY(14deg) rotateX(5deg); }
+  100% { transform: rotateY(-14deg) rotateX(5deg); }
 }
 
 @keyframes boomerang-throw {
@@ -187,7 +186,7 @@
   transform-style: preserve-3d;
 }
 .animate-card-rotation {
-  animation: card-rotation-sequence 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: card-rotation-sequence 9s ease-in-out infinite;
   transform-style: preserve-3d;
 }
 .animate-boomerang { animation: boomerang-throw 5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; animation-delay: 6s; }

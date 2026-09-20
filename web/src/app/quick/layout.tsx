@@ -1,0 +1,21 @@
+import { Sidebar } from "@/components/Sidebar";
+import { MobileBottomNav, MobileTopBar } from "@/components/MobileNav";
+
+export default function QuickLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="min-h-screen">
+      <MobileTopBar />
+      <div className="flex">
+        <Sidebar />
+        <main className="flex-1 min-w-0 md:ml-64 pb-24 md:pb-0 min-h-screen">
+          {children}
+        </main>
+      </div>
+      <MobileBottomNav />
+    </div>
+  );
+}
