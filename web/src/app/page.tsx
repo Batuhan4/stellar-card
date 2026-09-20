@@ -18,10 +18,10 @@ export default function LandingPage() {
       <main className="pt-24">
         {/* Hero */}
         <section className="relative min-h-[800px] xl:min-h-[900px] flex items-center px-6 sm:px-8 xl:px-16 overflow-hidden">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-32 -left-32 w-[700px] h-[700px] bg-primary/8 rounded-full blur-[140px]" />
-            <div className="absolute top-1/3 -right-32 w-[500px] h-[500px] bg-secondary/6 rounded-full blur-[120px]" />
-            <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-tertiary/5 rounded-full blur-[100px]" />
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-16 -left-16 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]" />
+            <div className="absolute top-1/3 -right-24 w-[400px] h-[400px] bg-secondary/8 rounded-full blur-[100px]" />
+            <div className="absolute bottom-0 left-1/3 w-[300px] h-[300px] bg-tertiary/8 rounded-full blur-[80px]" />
           </div>
 
           <div className="grid min-w-0 lg:grid-cols-2 gap-12 xl:gap-20 items-center w-full max-w-[1600px] mx-auto relative z-10">
@@ -33,7 +33,7 @@ export default function LandingPage() {
                 </span>
               </div>
 
-              <h1 className="text-5xl sm:text-6xl xl:text-7xl 2xl:text-8xl font-headline font-bold leading-[0.9] tracking-tight text-on-surface">
+              <h1 className="text-[2.5rem] sm:text-6xl xl:text-7xl 2xl:text-[6rem] font-headline font-bold leading-[0.9] tracking-tight text-on-surface">
                 Virtual cards for{" "}
                 <span className="text-primary">humans</span> and developers
               </h1>
